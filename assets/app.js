@@ -23,113 +23,27 @@ const pcdn = (m, v = '128x128') => 'https://images.pump.fun/coin-image/' + m + '
 function countTo(el, to, fmt, dur = 900) { if (!el || to == null || !isFinite(to)) return; const from = el._v || 0; el._v = to; const t0 = performance.now(); const f = n => { const k = Math.min(1, (n - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(from + (to - from) * e); if (k < 1) requestAnimationFrame(f) }; requestAnimationFrame(f) }
 
 /* =================== intro =================== */
+// the animation lives in maxx3d.js (WebGL). This only tracks loading and closes it.
 const LOADED = new Set();
-const INTRO = { done: false, t0: performance.now(), orbit: [], picked: new Set(), exitAt: null };
-function introProgress() {
-  if (INTRO.done) return;
-  const b = $('#ildB'), t = $('#ildT'); if (!b) return;
-  b.style.width = Math.max(10, LOADED.size / 4 * 100) + '%';
-  const all = [...ALL.values()], pf = all.filter(c => c.pad === 'pump.fun').length, sf = all.filter(c => c.pad === 'stonkfun').length;
-  if (all.length && t) t.innerHTML = `<i class="dot"></i>${all.length} live coins · pump.fun ${pf} · StonkFun ${sf}`;
-  // real coin logos join the orbit as they load
-  const pool = all.filter(c => !INTRO.picked.has(c.mint) && (c.pad === 'pump.fun' || c.simg)).slice(0, 18 - INTRO.picked.size);
-  pool.forEach(c => { INTRO.picked.add(c.mint); const im = new Image(); im.referrerPolicy = 'no-referrer'; im.onload = () => { if (!INTRO.done && INTRO.orbit.length < 16) INTRO.orbit.push({ im, born: Math.max(performance.now(), INTRO.t0 + 1850 + INTRO.orbit.length * 70), k: INTRO.orbit.length }) }; im.src = c.pad === 'pump.fun' ? pcdn(c.mint, '86x86') : c.simg });
-}
-function closeIntro() {
-  if (INTRO.done) return; INTRO.done = true; INTRO.exitAt = performance.now();
-  const el = $('#intro'); if (!el) return;
-  document.body.classList.add('entering'); document.body.classList.remove('locked');
-  el.classList.add('out');
-  setTimeout(() => el.remove(), 950); setTimeout(() => document.body.classList.remove('entering'), 2200);
+const INTRO = { done: false, t0: performance.now() };
+function introProgress() { if (INTRO.done) return; const b = $('#ildB'); if (b) b.style.width = Math.max(10, LOADED.size / 4 * 100) + '%' }
+function closeIntro(fast) {
+  if (INTRO.done) return; INTRO.done = true;
+  const el = $('#intro'); document.body.classList.remove('locked'); if (!el) return;
+  document.body.classList.add('entering'); setTimeout(() => document.body.classList.remove('entering'), 2200);
+  if (window.__mx3dIntro) window.__mx3dIntro.exit(fast === true);
+  else { el.classList.add('out'); setTimeout(() => el.remove(), 950) }
   revealAll();
 }
+window.__mx = { loaded: () => LOADED.size, close: () => closeIntro(false), isHome: () => VIEW === 'home' };
 (function intro() {
   const el = $('#intro'); if (!el) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('#iskip').onclick = closeIntro; el.addEventListener('click', e => { if (performance.now() - INTRO.t0 > 1200) closeIntro() });
-  addEventListener('keydown', e => { if (!INTRO.done && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) closeIntro() });
-  if (reduce) { setTimeout(closeIntro, 500); return }
-  const cv = $('#ic'), ctx = cv.getContext('2d'); let W = 0, H = 0, D = 1, box = null;
-  const size = () => { const ia = $('#ia'); if (!ia) { removeEventListener('resize', size); return } D = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * D; cv.height = H * D; ctx.setTransform(D, 0, 0, D, 0, 0); box = ia.getBoundingClientRect() };
-  size(); addEventListener('resize', size);
-  // warp stars
-  const ST = Array.from({ length: 160 }, () => ({ a: Math.random() * 6.283, d: Math.random(), s: .6 + Math.random() * 1.6, v: .25 + Math.random() * .6 }));
-  let P = [], N = 0, M = 0, ready = false;
-  const im = new Image();
-  im.onload = () => {
-    N = 46; M = Math.round(N * im.height / im.width);
-    const oc = document.createElement('canvas'); oc.width = N; oc.height = M; const o = oc.getContext('2d'); o.drawImage(im, 0, 0, N, M);
-    let d; try { d = o.getImageData(0, 0, N, M).data } catch (e) { return }
-    for (let y = 0; y < M; y++) for (let x = 0; x < N; x++) { const i = (y * N + x) * 4; if (d[i + 3] > 150) P.push({ x, y, r: d[i], g: d[i + 1], b: d[i + 2], a: Math.random() * 6.283, R: .45 + Math.random() * .55, dl: Math.hypot(x - N / 2, y - M / 2) / N * .55 + Math.random() * .3, sp: .8 + Math.random() * .45 }) }
-    ready = true;
-  };
-  im.src = 'assets/img/bull.png';
-  const ease = k => 1 - Math.pow(1 - k, 4), easeIO = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-  const iw = [...$$('#iw span')], GLY = 'aur#%&@$01▚▞▓<>/';
-  let feeStarted = false, flash = 0, shakeT = -1, impacted = false;
-  function drawOrbit(cx, cy, rx, ry, t, front, zoom) {
-    const n = INTRO.orbit.length; if (!n) return;
-    for (const o of INTRO.orbit) {
-      const ang = t * .55 + o.k / Math.max(8, n) * 6.283; const z = Math.sin(ang); if ((z >= 0) !== front) continue;
-      const pop = Math.max(0, Math.min(1, (performance.now() - o.born) / 450)), pe = 1 - Math.pow(1 - pop, 3); if (!pop) continue;
-      const sc = (.62 + .38 * (z + 1) / 2) * (0.4 + .6 * pe) * zoom;
-      const sz = 38 * sc, x = cx + Math.cos(ang) * rx * zoom - sz / 2, y = cy + z * ry * zoom - sz / 2;
-      ctx.globalAlpha = (.35 + .65 * (z + 1) / 2) * pop;
-      ctx.save(); ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, sz, sz, sz * .24); else ctx.rect(x, y, sz, sz); ctx.clip(); ctx.drawImage(o.im, x, y, sz, sz); ctx.restore();
-      ctx.strokeStyle = 'rgba(57,214,163,.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, sz, sz, sz * .24); else ctx.rect(x, y, sz, sz); ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
-  function frame(now) {
-    if (INTRO.done && !$('#intro')) return;
-    const t = (now - INTRO.t0) / 1000;
-    const ex = INTRO.exitAt ? Math.min(1, (now - INTRO.exitAt) / 850) : 0, zoom = 1 + easeIO(ex) * 1.6;
-    // trails while assembling, clean frame after
-    if (t < 1.9 && !ex) { ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,.32)'; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over' } else ctx.clearRect(0, 0, W, H);
-    if (!box) { requestAnimationFrame(frame); return }
-    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
-    let sx = 0, sy = 0; if (shakeT > 0 && t - shakeT < .35) { const k = 1 - (t - shakeT) / .35; sx = (Math.random() - .5) * 10 * k; sy = (Math.random() - .5) * 10 * k }
-    // warp stars rushing toward the A, then settling into a slow drift
-    const warp = Math.max(0, 1 - t / 1.8);
-    for (const s of ST) {
-      s.d -= (.004 + warp * .03) * s.v; if (s.d < .02) { s.d = 1; s.a = Math.random() * 6.283 }
-      const R = Math.max(W, H) * .75 * s.d, x = cx + Math.cos(s.a) * R, y = cy + Math.sin(s.a) * R * .8;
-      const len = warp * 26 * s.v; ctx.strokeStyle = `rgba(57,214,163,${.12 + .4 * (1 - s.d)})`; ctx.lineWidth = s.s;
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(s.a) * len, y + Math.sin(s.a) * len * .8); ctx.stroke();
-      if (!len) { ctx.fillStyle = `rgba(57,214,163,${.15 + .35 * (1 - s.d)})`; ctx.fillRect(x, y, s.s, s.s) }
-    }
-    if (ready) {
-      const cell = box.width / N * zoom, w = N * cell, h = M * cell;
-      const ox = cx - w / 2 + sx, oy = cy - h / 2 + sy + Math.sin(t * 1.6) * 4 * Math.min(1, Math.max(0, t - 1.8));
-      const orx = box.width * 1.05, ory = box.width * .32;
-      drawOrbit(cx + sx, cy + sy, orx, ory, t, false, zoom);
-      const sweep = ((t - 1.9) % 2.4) / 2.4; let all = true;
-      for (const p of P) {
-        const k = Math.max(0, Math.min(1, (t - .15 - p.dl) / (1.05 * p.sp))), e = ease(k); if (k < 1) all = false;
-        const tx = ox + p.x * cell, ty = oy + p.y * cell;
-        const R = Math.max(W, H) * .62 * p.R * (1 - e), th = p.a + (1 - e) * 5.5;
-        const spx = cx + Math.cos(th) * R, spy = cy + Math.sin(th) * R * .7;
-        const x = spx + (tx - spx) * e, y = spy + (ty - spy) * e;
-        const wv = 1 - e; ctx.globalAlpha = Math.min(1, k * 2) * (1 - ex);
-        ctx.fillStyle = `rgb(${p.r + (255 - p.r) * wv | 0},${p.g + (255 - p.g) * wv | 0},${p.b + (255 - p.b) * wv | 0})`;
-        const s = cell * (k < 1 ? .5 + .45 * e : .95); ctx.fillRect(x, y, s, s);
-        if (t > 1.9 && k >= 1) { const d = (p.x + p.y) / (N + M), wd = Math.abs(d - sweep); if (wd < .05) { ctx.globalAlpha = (1 - wd / .05) * .6 * (1 - ex); ctx.fillStyle = '#fff'; ctx.fillRect(x, y, s, s) } }
-      }
-      ctx.globalAlpha = 1;
-      if (all && !impacted && t > 1) { impacted = true; flash = 1; shakeT = t }
-      if (impacted) {
-        const it = t - shakeT; if (it < 1.1) { const k = it / 1.1, r = box.width * (.6 + k * 2.4); ctx.strokeStyle = `rgba(159,243,214,${(1 - k) * .7})`; ctx.lineWidth = 3 * (1 - k) + .5; ctx.beginPath(); ctx.ellipse(cx, cy, r, r * .8, 0, 0, 6.283); ctx.stroke(); const r2 = box.width * (.5 + k * 1.5); ctx.strokeStyle = `rgba(143,120,255,${(1 - k) * .45})`; ctx.beginPath(); ctx.ellipse(cx, cy, r2, r2 * .8, 0, 0, 6.283); ctx.stroke() }
-      }
-      drawOrbit(cx + sx, cy + sy, orx, ory, t, true, zoom);
-      if (flash > 0) { ctx.fillStyle = `rgba(159,243,214,${flash * .22})`; ctx.fillRect(0, 0, W, H); flash = Math.max(0, flash - .05) }
-    }
-    // wordmark scramble then settle
-    iw.forEach((s, i) => { const st = 1.75 + i * .1, set = st + .38; if (t >= st && !s.classList.contains('on')) s.classList.add('on'); if (t >= st && t < set) s.textContent = GLY[(Math.random() * GLY.length) | 0]; else if (t >= set && !s.classList.contains('set')) { s.textContent = 'aura'[i]; s.classList.add('set') } });
-    if (t > 2.3 && !feeStarted && $('#ifeeV')) { feeStarted = true; const v = $('#ifeeV'), t1 = performance.now(); const f = n => { const k = Math.min(1, (n - t1) / 1000), e = 1 - Math.pow(1 - k, 3); v.textContent = (1.25 - .75 * e).toFixed(2) + '%'; if (k < 1) requestAnimationFrame(f) }; requestAnimationFrame(f) }
-    if (!INTRO.done && ((t > 4.4 && LOADED.size >= 2) || t > 6.2)) closeIntro();
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
+  $('#iskip').onclick = e => { e.stopPropagation(); closeIntro(true) };
+  el.addEventListener('click', () => { if (performance.now() - INTRO.t0 > 900) closeIntro(true) });
+  addEventListener('keydown', e => { if (!INTRO.done && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) closeIntro(true) });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { setTimeout(() => closeIntro(true), 400); return }
+  // no WebGL or the 3D module didn't load: a short 2D version
+  setTimeout(() => { if (INTRO.done || (window.__mx3d && window.__mx3d.intro)) return; el.classList.add('fb'); setTimeout(() => closeIntro(false), 1900) }, 1800);
 })();
 
 /* =================== data =================== */
@@ -177,6 +91,7 @@ function addNew(L, src) {
   feed(L.filter(c => FIRSTS[src] || fresh.includes(c.mint)).sort(byNew).slice(0, 12), !FIRSTS[src]);
   FIRSTS[src] = false;
   if (TAB === 'new') grid(fresh); stats();
+  fresh.slice(0, 2).forEach((m, i) => setTimeout(() => { const c = ALL.get(m); if (c) drop(c, 'new') }, 400 + i * 1100));
 }
 async function loadJNew() {
   try { const L = keep((await jget('recent')).filter(t => PADS.has(t.launchpad)).map(fromJup)); addNew(L, 'j') }
@@ -197,7 +112,7 @@ async function loadTrend() {
 async function loadAura() {
   try {
     const L = keep((await jget('toporganicscore/1h?limit=100')).filter(t => PADS.has(t.launchpad)).map(fromJup));
-    S.aura = L.sort((a, b) => (b.aura || 0) - (a.aura || 0)).slice(0, 48).map(c => c.mint); king(); if (TAB === 'aura') grid();
+    S.aura = L.sort((a, b) => (b.aura || 0) - (a.aura || 0)).slice(0, 48).map(c => c.mint); king(); stats(); if (TAB === 'aura') grid();
   } catch (e) { if (!S.aura.length) $('#king').innerHTML = '<div class="empty">Jupiter isn\'t answering right now.</div>' } finally { LOADED.add('au'); introProgress() }
 }
 let SFTOP = [];
@@ -279,7 +194,7 @@ function meter() {
 }
 setInterval(() => { const n = performance.now(); TICK += RATE * (n - TLAST) / 1000; TLAST = n; const el = $('#mT'); if (el) el.textContent = '$' + TICK.toFixed(2) }, 120);
 function stats() {
-  ladder(); pairs();
+  ladder(); pairs(); levelUps(); mmap();
   const all = [...ALL.values()]; const pf = all.filter(c => c.pad === 'pump.fun').length, sf = all.filter(c => c.pad === 'stonkfun').length;
   const n10 = all.filter(c => c.created && Date.now() - new Date(c.created) < 600000).length;
   const vol = all.reduce((a, c) => a + (c.v1 || 0), 0);
@@ -311,6 +226,89 @@ function sfFeeNote() {
   const lo = Math.min(...f) / 100, hi = Math.max(...f) / 100;
   $('#sfFeeNote').textContent = `StonkFun coins set their own transfer fee. On the ${f.length} StonkFun coins on the board right now it runs from ${lo}% to ${hi}%, per StonkFun's API.`;
 }
+
+/* =================== live drops on the hero bull =================== */
+function drop(c, kind, note) {
+  dispatchEvent(new CustomEvent('mx:pulse', { detail: { kind } }));
+  const box = $('#drops'); if (!box || VIEW !== 'home' || document.hidden || !INTRO.done) return;
+  const d = document.createElement('div'); d.className = 'drop' + (kind === 'lvl' ? ' lvl' : '');
+  d.innerHTML = `${img(c, '', '', 's')}<b>$${esc((c.sym || '').slice(0, 10))}</b>${kind === 'lvl' ? note : `<span>${padName(c.pad)} · just launched</span>`}`;
+  box.prepend(d); while (box.children.length > 3) box.lastChild.remove(); setTimeout(() => d.remove(), 5600);
+}
+
+/* =================== live level-ups =================== */
+const LVP = new Map(), LUPS = [];
+function levelUps() {
+  const ev = [];
+  for (const c of ALL.values()) { const l = lvlOf(c); if (l < 0) continue; const p = LVP.get(c.mint); if (p != null && l > p) ev.push({ c, from: p, to: l, at: Date.now() }); LVP.set(c.mint, l) }
+  if (ev.length) {
+    LUPS.unshift(...ev); LUPS.splice(30);
+    ev.slice(0, 2).forEach((e, i) => setTimeout(() => {
+      drop(e.c, 'lvl', `<span>${LVL[e.from].n} →</span>${lvBadge(e.c)}`);
+      $$(`.cc[data-m="${e.c.mint}"]`).forEach(x => { x.classList.remove('lvup'); void x.offsetWidth; x.classList.add('lvup') });
+    }, 300 + i * 1200));
+  }
+  const box = $('#lupl'); if (!box) return;
+  if (!LUPS.length) { const n = LVP.size; box.innerHTML = `<span class="lempty">Watching ${n.toLocaleString('en-US')} rated coin${n === 1 ? '' : 's'}. A level-up shows here the moment its maxx score crosses a line.</span>`; return }
+  box.innerHTML = LUPS.map(e => `<a class="lup" href="#/coin/${e.c.mint}">${img(e.c, '', '', 's')}<b>$${esc((e.c.sym || '').slice(0, 10))}</b><span class="ar">${LVL[e.from].n} →</span>${lvBadge(e.c)}<span>${ago(e.at)} ago</span></a>`).join('');
+}
+
+/* =================== stonk market map (squarified treemap) =================== */
+let MMB = 'v1', MMP = 'all';
+function squarify(vals, X, Y, W, H) {
+  const out = [], total = vals.reduce((a, v) => a + v.v, 0); if (!total) return out;
+  let items = vals.map(v => ({ ...v, a: v.v * W * H / total })), x = X, y = Y, w = W, h = H;
+  while (items.length) {
+    const side = Math.min(w, h); let row = [], best = Infinity, i = 0;
+    while (i < items.length) {
+      const r = [...row, items[i]], sum = r.reduce((a, b) => a + b.a, 0), mx = Math.max(...r.map(b => b.a)), mn = Math.min(...r.map(b => b.a));
+      const worst = Math.max(side * side * mx / (sum * sum), sum * sum / (side * side * mn)); if (worst > best) break; best = worst; row = r; i++;
+    }
+    items = items.slice(row.length);
+    const sum = row.reduce((a, b) => a + b.a, 0), th = sum / side; let o = 0;
+    for (const b of row) { const len = b.a / th; out.push(w >= h ? { ...b, x, y: y + o, w: th, h: len } : { ...b, x: x + o, y, w: len, h: th }); o += len }
+    if (w >= h) { x += th; w -= th } else { y += th; h -= th }
+  }
+  return out;
+}
+const heat = v => { if (v == null || !isFinite(v)) return 'rgb(21,42,48)'; const k = Math.max(-1, Math.min(1, v / 25)), t = Math.pow(Math.abs(k), .65), n = [19, 42, 48], to = k >= 0 ? [30, 168, 126] : [206, 62, 94]; return `rgb(${n.map((x, i) => Math.round(x + (to[i] - x) * t)).join(',')})` };
+function mmap() {
+  const box = $('#mmap'); if (!box || VIEW !== 'home') return;
+  const L = [...ALL.values()].filter(c => c.sym && (c[MMB] || 0) > 0 && (MMP === 'all' || c.pad === MMP)).sort((a, b) => b[MMB] - a[MMB]).slice(0, 40);
+  const W = box.clientWidth, H = box.clientHeight; if (!W || !H) return;
+  if (!L.length) { if (ALL.size) box.innerHTML = `<div class="empty" style="position:absolute;inset:0;display:grid;place-items:center">${MMB === 'v1' ? 'No last-hour volume reported for these coins yet.' : 'No market caps reported yet.'}</div>`; return }
+  box.querySelectorAll('.skel,.empty').forEach(e => e.remove());
+  const have = new Map([...box.querySelectorAll('.mt')].map(e => [e.dataset.m, e])), keepSet = new Set();
+  for (const r of squarify(L.map(c => ({ c, v: c[MMB] })), 0, 0, W, H)) {
+    const c = r.c; keepSet.add(c.mint);
+    let el = have.get(c.mint); if (!el) { el = document.createElement('div'); el.className = 'mt new'; el.dataset.m = c.mint; box.appendChild(el) }
+    const m = Math.min(r.w, r.h), fs = Math.max(10, Math.min(26, m / 5.2)), is = Math.min(58, m * .36);
+    el.style.cssText = `left:${r.x.toFixed(1)}px;top:${r.y.toFixed(1)}px;width:${r.w.toFixed(1)}px;height:${r.h.toFixed(1)}px;background-color:${heat(c.c1)};--fs:${fs.toFixed(1)}px;--is:${is.toFixed(0)}px`;
+    el.classList.toggle('xs', r.w < 74 || r.h < 56 || is < 18); el.classList.toggle('xxs', r.w < 36 || r.h < 22);
+    const key = (c.sym || '') + '|' + pct(c.c1) + '|' + (is >= 18);
+    if (el._k !== key) { el._k = key; el.innerHTML = `${is >= 18 ? img(c, '', '', 's') : ''}<b>$${esc((c.sym || '').slice(0, 10))}</b><span>${pct(c.c1)}</span>` }
+  }
+  have.forEach((e, m) => { if (!keepSet.has(m)) e.remove() });
+  const tot = L.reduce((a, c) => a + (c[MMB] || 0), 0);
+  $('#mmNote').textContent = `${L.length} coins · ${usd(tot)} ${MMB === 'v1' ? 'traded in the last hour' : 'combined market cap'} · colour = 1h change · tap a tile`;
+}
+$('#mmBy').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; MMB = b.dataset.b; $$('#mmBy button').forEach(x => x.classList.toggle('on', x === b)); mmap() });
+$('#mmPad').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; MMP = b.dataset.p; $$('#mmPad button').forEach(x => x.classList.toggle('on', x === b)); mmap() });
+$('#mmap').addEventListener('click', e => { const t = e.target.closest('.mt'); if (t) location.hash = '#/coin/' + t.dataset.m });
+{ let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(mmap, 150) }) }
+(function mtip() {
+  const tip = $('#mtip'), box = $('#mmap'); let cur = '';
+  box.addEventListener('pointermove', e => {
+    const t = e.target.closest('.mt'); if (!t) { tip.classList.remove('on'); cur = ''; return }
+    const c = ALL.get(t.dataset.m); if (!c) return;
+    if (cur !== c.mint) { cur = c.mint; tip.innerHTML = `<div class="h">${img(c, '', '', 's')}<div><b>$${esc((c.sym || '').slice(0, 14))}</b><br>${esc((c.name || '').slice(0, 30))}</div></div>
+      <div class="r"><span>Platform</span><b>${padName(c.pad)}${c.quote ? ' · ' + esc(c.quote) : ''}</b></div><div class="r"><span>Market cap</span><b>${usd(c.mcap)}</b></div><div class="r"><span>Volume 1h</span><b>${usd(c.v1)}</b></div>
+      <div class="r"><span>1h change</span><b class="${(c.c1 || 0) < 0 ? 'dn' : 'up'}">${pct(c.c1)}</b></div><div class="r"><span>Holders</span><b>${fmtN(c.holders)}</b></div><div class="r"><span>Level</span><b>${lvBadge(c)}</b></div>` }
+    const x = Math.min(innerWidth - tip.offsetWidth - 12, e.clientX + 16), y = Math.min(innerHeight - tip.offsetHeight - 12, e.clientY + 16);
+    tip.style.left = x + 'px'; tip.style.top = y + 'px'; tip.classList.add('on');
+  });
+  box.addEventListener('pointerleave', () => { tip.classList.remove('on'); cur = '' });
+})();
 
 /* =================== board =================== */
 function card(c, fresh) {
@@ -367,7 +365,75 @@ $('#q').addEventListener('input', e => {
   }, 400);
 });
 $('#q').addEventListener('keydown', e => { if (e.key === 'Enter' && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(Q)) location.hash = '#/coin/' + Q });
-addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '') && INTRO.done) { e.preventDefault(); $('#q').focus() } });
+/* =================== ⌘K palette =================== */
+const ICO = { home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>', grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>', trend: '<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>', ladder: '<path d="M7 3v18M17 3v18M7 7h10M7 12h10M7 17h10"/>', map: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h9M12 8h9"/>', star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>', plus: '<path d="M12 5v14M5 12h14"/>', calc: '<circle cx="12" cy="12" r="9"/><path d="M12 7v10"/>', q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>', filter: '<path d="M3 5h18l-7 8v6l-4-2v-4z"/>', addr: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/>' };
+const ico = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO[k] || ''}</svg>`;
+const PAGES = [['Home', '#/', 'home'], ['The board', '#/board', 'grid'], ['Trending', '#/trending', 'trend'], ['The maxx ladder', '#/ladder', 'ladder'], ['Stonk market map', '#/map', 'map'], ['Watchlist', '#/watch', 'star'], ['Launch a coin', '#/launch', 'plus'], ['Maxx check', '#/check', 'calc'], ['FAQ', '#/faq', 'q']];
+const CK = { open: false, sel: 0, items: [], q: '', remote: [], busy: false, t: null };
+function ckOpen(pref = '') { const m = $('#cmdk'); m.hidden = false; requestAnimationFrame(() => m.classList.add('on')); CK.open = true; CK.q = pref; CK.sel = 0; CK.remote = []; $('#ckq').value = pref; ckRender(); setTimeout(() => $('#ckq').focus(), 30) }
+function ckClose() { const m = $('#cmdk'); m.classList.remove('on'); CK.open = false; setTimeout(() => { if (!CK.open) m.hidden = true }, 200) }
+function ckItems() {
+  const raw = CK.q.trim(), q = raw.toLowerCase(), out = [];
+  if (!q) {
+    const top = [...ALL.values()].filter(c => c.aura != null).sort((a, b) => (b.aura || 0) - (a.aura || 0)).slice(0, 5);
+    if (top.length) out.push({ g: 'Most maxxed right now' }, ...top.map(c => ({ c })));
+    out.push({ g: 'Go to' }, ...PAGES.map(p => ({ p }))); return out;
+  }
+  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(raw)) out.push({ g: 'Address' }, { addr: raw });
+  const rank = c => { const s = (c.sym || '').toLowerCase(); return s === q ? 0 : s.startsWith(q) ? 1 : s.includes(q) ? 2 : 3 };
+  const loc = [...ALL.values()].filter(c => (c.sym || '').toLowerCase().includes(q) || (c.name || '').toLowerCase().includes(q) || c.mint === raw).sort((a, b) => rank(a) - rank(b) || (b.mcap || 0) - (a.mcap || 0));
+  const seen = new Set(loc.map(c => c.mint)), rem = CK.remote.map(m => ALL.get(m)).filter(c => c && !seen.has(c.mint));
+  const coins = [...loc, ...rem].slice(0, 12);
+  if (coins.length) out.push({ g: 'Coins' + (CK.busy ? ' · searching…' : '') }, ...coins.map(c => ({ c })));
+  else out.push({ g: 'Coins' }, { msg: CK.busy ? 'Searching StonkFun and Jupiter…' : 'No coin matches yet. Paste a full address to open any coin.' });
+  out.push({ g: 'Actions' }, { act: 'filter', label: `Filter the board for “${raw}”` });
+  const pg = PAGES.filter(p => p[0].toLowerCase().includes(q)); if (pg.length) out.push({ g: 'Go to' }, ...pg.map(p => ({ p })));
+  return out;
+}
+const ckSel = () => CK.items.filter(x => !x.g && !x.msg);
+function ckRender() {
+  CK.items = ckItems(); const n = ckSel().length; CK.sel = Math.max(0, Math.min(CK.sel, n - 1)); let k = -1;
+  $('#ckl').innerHTML = CK.items.map(x => {
+    if (x.g) return `<div class="ck-g">${esc(x.g)}</div>`; if (x.msg) return `<div class="ck-none">${esc(x.msg)}</div>`;
+    k++; const on = k === CK.sel ? ' on' : '';
+    if (x.c) { const c = x.c; return `<div class="ck-i${on}" data-k="${k}">${img(c, '', '', 's')}<div class="tx"><b>$${esc((c.sym || '').slice(0, 14))} <span style="color:var(--dim);font-weight:500">${esc((c.name || '').slice(0, 28))}</span></b><span>${padName(c.pad)}${c.quote ? ' · paired with ' + esc(c.quote) : ''} · ${short(c.mint)}${c.aura != null ? ' · ' + LVL[lvlOf(c)].n : ''}</span></div><div class="rt"><b>${usd(c.mcap)}</b><span class="${(c.c1 || 0) < 0 ? 'dn' : 'up'}">${pct(c.c1)}</span></div></div>` }
+    if (x.addr) return `<div class="ck-i${on}" data-k="${k}"><span class="ic">${ico('addr')}</span><div class="tx"><b>Open coin ${esc(short(x.addr))}</b><span>Reads it live from Jupiter and StonkFun</span></div></div>`;
+    if (x.act) return `<div class="ck-i${on}" data-k="${k}"><span class="ic">${ico('filter')}</span><div class="tx"><b>${esc(x.label)}</b><span>Shows every match on the board</span></div></div>`;
+    return `<div class="ck-i${on}" data-k="${k}"><span class="ic">${ico(x.p[2])}</span><div class="tx"><b>${esc(x.p[0])}</b><span>${esc(x.p[1].replace('#', 'maxxing'))}</span></div></div>`;
+  }).join('');
+  $('#ckl .ck-i.on')?.scrollIntoView({ block: 'nearest' });
+}
+function ckGo(x) {
+  if (!x) return; ckClose();
+  if (x.c) location.hash = '#/coin/' + x.c.mint; else if (x.addr) location.hash = '#/coin/' + x.addr; else if (x.p) location.hash = x.p[1];
+  else if (x.act === 'filter') { Q = CK.q.trim(); $('#q').value = Q; REMOTE = CK.remote.slice(); location.hash = '#/board'; grid(); goMarket() }
+}
+$('#ckq').addEventListener('input', e => {
+  CK.q = e.target.value; CK.sel = 0; CK.remote = []; const q = CK.q.trim(); clearTimeout(CK.t);
+  CK.busy = q.length >= 2; ckRender(); if (!CK.busy) return;
+  CK.t = setTimeout(async () => {
+    const [a, b] = await Promise.allSettled([jget('search?query=' + encodeURIComponent(q)), get(`${SFAPI}?q=${encodeURIComponent(q)}&pageSize=20&page=1`)]);
+    if (q !== CK.q.trim()) return;
+    const L = [...(a.status === 'fulfilled' ? keep(a.value.filter(t => PADS.has(t.launchpad)).map(fromJup)) : []), ...(b.status === 'fulfilled' ? keep((b.value.data?.tokens || []).map(fromSF)) : [])];
+    CK.remote = [...new Set(L.map(c => c.mint))]; CK.busy = false; if (CK.open) ckRender();
+  }, 300);
+});
+$('#ckq').addEventListener('keydown', e => {
+  const n = ckSel().length;
+  if (e.key === 'ArrowDown') { e.preventDefault(); CK.sel = (CK.sel + 1) % Math.max(1, n); ckRender() }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); CK.sel = (CK.sel - 1 + n) % Math.max(1, n); ckRender() }
+  else if (e.key === 'Enter') { e.preventDefault(); ckGo(ckSel()[CK.sel]) }
+  else if (e.key === 'Escape') { e.preventDefault(); ckClose() }
+});
+$('#ckl').addEventListener('click', e => { const i = e.target.closest('.ck-i'); if (i) ckGo(ckSel()[+i.dataset.k]) });
+$('#ckl').addEventListener('mousemove', e => { const i = e.target.closest('.ck-i'); if (i && +i.dataset.k !== CK.sel) { CK.sel = +i.dataset.k; $$('#ckl .ck-i').forEach(x => x.classList.toggle('on', x === i)) } });
+$('#cmdk').addEventListener('click', e => { if (e.target.id === 'cmdk') ckClose() });
+$('#qbtn').addEventListener('click', () => ckOpen()); $('#qbtn2').addEventListener('click', () => ckOpen());
+$('#qk').textContent = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘K' : 'Ctrl K';
+addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (!INTRO.done) return; CK.open ? ckClose() : ckOpen(); return }
+  if (e.key === '/' && !CK.open && INTRO.done && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '')) { e.preventDefault(); ckOpen() }
+});
 
 /* watchlist + delegated clicks */
 function toggleWatch(m) {
@@ -522,10 +588,10 @@ let VIEW = 'home';
 function goMarket() { requestAnimationFrame(() => $('#market').scrollIntoView({ behavior: 'smooth', block: 'start' })) }
 function route() {
   const h = location.hash.replace(/^#/, '') || '/'; const [, r, arg] = h.split('/');
-  const view = r === 'coin' ? 'coin' : r === 'how' ? 'faq' : r === 'ladder' ? 'home' : ['launch', 'check', 'faq', 'watch'].includes(r) ? r : 'home';
+  const view = r === 'coin' ? 'coin' : r === 'how' ? 'faq' : r === 'ladder' || r === 'map' ? 'home' : ['launch', 'check', 'faq', 'watch'].includes(r) ? r : 'home';
   const prevView = VIEW; VIEW = view;
   $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + view));
-  const nav = r === 'board' || r === 'trending' || r === 'ladder' ? r : view;
+  const nav = r === 'board' || r === 'trending' || r === 'ladder' || r === 'map' ? r : view;
   $$('#nav a,#mob a').forEach(a => a.classList.toggle('on', a.dataset.r === nav));
   if (view !== 'coin') CUR = null;
   if (view === 'coin' && arg) coin(arg);
@@ -534,9 +600,10 @@ function route() {
   if (view === 'watch') { wgrid(); enrich() }
   if (r === 'trending') setTab('trend');
   if (r === 'ladder') requestAnimationFrame(() => $('#ladderSec').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  if (r === 'map') requestAnimationFrame(() => $('#mapSec').scrollIntoView({ behavior: 'smooth', block: 'start' }));
   if (r === 'board' || r === 'trending') { grid(); if (prevView !== 'home') scrollTo(0, 0); goMarket() }
-  else if (r !== 'ladder') scrollTo({ top: 0, behavior: 'auto' });
-  if (view === 'home') revealAll();
+  else if (r !== 'ladder' && r !== 'map') scrollTo({ top: 0, behavior: 'auto' });
+  if (view === 'home') { revealAll(); requestAnimationFrame(mmap) }
 }
 addEventListener('hashchange', route);
 
