@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>maxxing</title>
+<meta name="description" content="The launchpad that's always maxxing. Fees minned, creators maxxed, snipers mogged, and every coin levels up from Mid to Ascended. Live StonkFun and pump.fun coins.">
+<meta property="og:title" content="maxxing">
+<meta property="og:description" content="pump.fun stopped maxxing. Every trade here costs less, and every coin levels up.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#071013">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:Pix;src:url(assets/fonts/pixelify-sans-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:Pix;src:url(assets/fonts/pixelify-sans-latin-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
+:root{--jupiter-plugin-primary:57,214,163;--jupiter-plugin-background:13,28,33;--jupiter-plugin-primary-text:243,248,248;--jupiter-plugin-warning:251,191,36;--jupiter-plugin-interactive:17,37,41;--jupiter-plugin-module:10,22,26;
+--bg:#071013;--bg2:#0a161a;--card:#0d1c21;--card2:#112529;--line:#17303a;--line2:#21414d;--tx:#f3f8f8;--mut:#8aa3ad;--dim:#5d7781;--a:#39d6a3;--a2:#9ff3d6;--a3:#69aac1;--up:#4ade80;--dn:#fb7185;--pf:#a4c5cf;--sf:#5ee9b5;--mx:#e6fbf4;--stl:#69aac1;--glow:0 0 0 1px rgba(57,214,163,.35),0 10px 40px rgba(105,170,193,.18)}
+*{box-sizing:border-box}
+html{scrollbar-width:thin;scrollbar-color:#1d3a44 transparent;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body.locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+.pix{font-family:Pix,monospace}
+.num{font-family:Inter,system-ui,sans-serif;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+img{display:block}
+
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;z-index:200;background:#050d10;display:grid;place-items:center;overflow:hidden;transition:opacity .75s ease,transform .9s cubic-bezier(.6,0,.2,1),filter .75s ease;cursor:default}
+#intro::before{content:'';position:absolute;inset:-2px;background-image:linear-gradient(rgba(57,214,163,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(57,214,163,.06) 1px,transparent 1px);background-size:34px 34px;-webkit-mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 62%);mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 62%);animation:gridIn 2.2s ease both;transform-origin:50% 42%}
+#intro::after{content:'';position:absolute;width:80vmin;height:80vmin;left:50%;top:40%;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(105,170,193,.30),transparent 62%);animation:breathe 3.2s ease-in-out infinite,glowIn 1.6s ease both;pointer-events:none}
+@keyframes gridIn{from{opacity:0;transform:perspective(600px) rotateX(55deg) scale(1.6)}}
+@keyframes breathe{50%{transform:scale(1.12);opacity:.75}}
+@keyframes glowIn{from{opacity:0}}
+#intro.out{opacity:0;transform:scale(1.18);filter:blur(10px);pointer-events:none}
+#ic{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.iwrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;pointer-events:none}
+#ia{width:min(40vmin,280px);aspect-ratio:299/360}
+.iw{font:700 clamp(54px,10vw,96px)/1 Pix;color:var(--a2);display:flex;gap:.02em;text-shadow:0 0 40px rgba(57,214,163,.5);min-height:1em}
+.iw span{display:inline-block;opacity:0;transition:opacity .15s}
+.iw span.on{opacity:1}
+.iw span.set{animation:lset .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes lset{from{transform:translateY(-14px) scale(1.25);color:#fff;text-shadow:0 0 30px #fff}}
+.ifee{display:flex;align-items:center;gap:14px;margin-top:16px;font-weight:700;color:var(--mut);opacity:0;animation:fin .5s 2.25s forwards}
+.ifee s{color:var(--dn);text-decoration-thickness:2px}
+.ifee b{font:800 22px Inter;color:var(--a);font-variant-numeric:tabular-nums;min-width:74px;text-align:left;display:inline-block}
+.ifee i{font-style:normal;color:var(--dim)}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ild{margin-top:14px;opacity:0;animation:fin .5s 2.5s forwards}
+.ild small{display:inline-flex;align-items:center;gap:8px;color:var(--dim);font-size:12px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.ibar{position:absolute;left:0;right:0;bottom:0;height:2px;z-index:3;background:rgba(57,214,163,.08)}
+.ibar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a3),var(--a));box-shadow:0 0 14px var(--a);transition:width .5s ease}
+.iskip{position:absolute;right:18px;bottom:14px;z-index:3;background:none;border:0;color:var(--dim);font:600 11px Inter;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.iskip:hover{color:var(--tx);opacity:1}
+/* site entrance after the intro */
+@keyframes enUp{from{opacity:0;transform:translateY(26px)}}
+@keyframes enDown{from{opacity:0;transform:translateY(-18px)}}
+@keyframes enLeft{from{opacity:0;transform:translateX(-26px)}}
+@keyframes enRight{from{opacity:0;transform:translateX(30px) scale(.97)}}
+body.entering .feed{animation:enDown .6s .05s both}
+body.entering aside .logo{animation:enLeft .6s .1s both}
+body.entering aside .nav a,body.entering aside .sbtn,body.entering aside .slab,body.entering aside .ls{animation:enLeft .55s both;animation-delay:calc(.14s + var(--d,0) * 45ms)}
+body.entering aside .side-foot{animation:enUp .6s .6s both}
+body.entering .top{animation:enDown .6s .12s both}
+body.entering .hero{animation:enUp .8s .15s both}
+body.entering .hx>*{animation:enUp .7s both}
+body.entering .hx>*:nth-child(1){animation-delay:.3s}body.entering .hx>*:nth-child(2){animation-delay:.38s}body.entering .hx>*:nth-child(3){animation-delay:.46s}body.entering .hx>*:nth-child(4){animation-delay:.54s}body.entering .hx>*:nth-child(5){animation-delay:.62s}
+body.entering .meter{animation:enRight .8s .42s both}
+body.entering .hero .vx{animation:enUp 1s .5s both}
+
+/* ---------- live feed bar ---------- */
+.feed{position:sticky;top:0;z-index:40;height:36px;background:#060e11;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 14px;overflow:hidden}
+.feed .lb{flex:none;font:700 11px Pix;letter-spacing:.06em;color:var(--a);display:flex;align-items:center;gap:7px;text-transform:uppercase}
+.feed::after{content:'';position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(90deg,transparent,#060e11);pointer-events:none}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--a);box-shadow:0 0 10px var(--a);animation:blink 1.4s infinite;flex:none;display:inline-block}
+@keyframes blink{50%{opacity:.3}}
+.fi{flex:none;display:flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:12px;white-space:nowrap;transition:background .3s,border-color .3s}
+.fi:hover{border-color:var(--a)}
+.fi img{width:20px;height:20px;border-radius:5px;object-fit:cover;background:var(--card2)}
+.fi b{font-weight:700}.fi span{color:var(--mut)}
+.fi .pdot{margin:0}
+.fi.hit{animation:shake .5s,flashA 1.4s}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-4px) rotate(-1deg)}40%{transform:translateX(4px) rotate(1deg)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes flashA{0%{background:rgba(57,214,163,.5);border-color:var(--a)}100%{background:var(--card);border-color:var(--line)}}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:2px;background:var(--bg);overflow-y:auto;scrollbar-width:none}
+aside::-webkit-scrollbar{display:none}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+.logo img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(57,214,163,.45));animation:bob 4s ease-in-out infinite}
+.logo b{font:700 26px/1 Pix;color:var(--a2);letter-spacing:.01em}
+@keyframes bob{50%{transform:translateY(-3px) rotate(-3deg)}}
+.slab{font:700 10.5px Pix;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:14px 12px 6px}
+.nav a,.sbtn{position:relative;display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;color:var(--mut);font-weight:600;transition:background .2s,color .2s;border:0;background:none;font-size:14px;cursor:pointer;width:100%;text-align:left}
+.nav a svg,.sbtn svg{width:18px;height:18px;flex:none;transition:transform .3s}
+.nav a:hover,.sbtn:hover{background:var(--card);color:var(--tx)}
+.nav a:hover svg,.sbtn:hover svg{transform:scale(1.15) rotate(-6deg)}
+.nav a.on,.sbtn.on{background:var(--card2);color:var(--tx)}
+.nav a.on::before,.sbtn.on::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--a);box-shadow:0 0 10px var(--a)}
+.cnt{margin-left:auto;font:700 11px Inter;color:var(--mut);background:var(--card2);border:1px solid var(--line2);border-radius:6px;padding:1px 6px;font-variant-numeric:tabular-nums}
+.pdot{width:8px;height:8px;border-radius:50%;flex:none;margin:0 5px;display:inline-block}
+.pdot.pf{background:var(--pf);box-shadow:0 0 8px var(--pf)}.pdot.au{background:var(--mx);box-shadow:0 0 8px var(--a);animation:blink 1.6s infinite}.pdot.sf{background:var(--sf);box-shadow:0 0 8px var(--sf)}
+.lstats{padding:4px 12px 0;display:flex;flex-direction:column;gap:7px}
+.ls{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px;color:var(--mut)}
+.ls b{color:var(--tx);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.side-foot{margin-top:auto;padding:16px 4px 2px;display:flex;flex-direction:column;gap:8px}
+main{min-width:0}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 22px;background:rgba(7,16,19,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.search{flex:1;max-width:520px;position:relative}
+.search input{width:100%;height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--card);color:var(--tx);padding:0 40px 0 38px;font:500 14px Inter;outline:none;transition:border-color .2s,box-shadow .2s}
+.search input:focus{border-color:var(--a);box-shadow:0 0 0 4px rgba(57,214,163,.14)}
+.search svg{position:absolute;left:12px;top:11px;width:18px;height:18px;color:var(--dim)}
+.search kbd{position:absolute;right:10px;top:10px;font:600 11px Inter;color:var(--dim);border:1px solid var(--line2);border-radius:5px;padding:1px 6px}
+.top .sp{flex:1}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;border:1px solid transparent;font:700 14px Inter;cursor:pointer;transition:transform .12s,background .2s,box-shadow .2s,border-color .2s;white-space:nowrap;color:inherit;background:none}
+.btn svg{width:16px;height:16px}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--a);color:#03140e;box-shadow:0 0 24px rgba(57,214,163,.3)}
+.btn.pri::after{content:'';position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:bshine 3.8s ease-in-out infinite;pointer-events:none}
+@keyframes bshine{0%,60%{left:-60%}100%{left:130%}}
+.btn.pri:hover{background:#5ee9b5;box-shadow:0 0 34px rgba(57,214,163,.5)}
+.btn.gh{background:var(--card);border-color:var(--line2);color:var(--tx)}
+.btn.gh:hover{border-color:var(--a)}
+.btn.sm{height:32px;padding:0 12px;font-size:12.5px;border-radius:8px}
+.btn.xs{height:28px;padding:0 10px;font-size:12px;border-radius:8px}
+.btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+.btn[disabled]::after{display:none}
+.page{padding:22px 22px 80px;max-width:1500px}
+.view{display:none;animation:vin .4s ease}
+.view.on{display:block}
+@keyframes vin{from{opacity:0;transform:translateY(10px)}}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.rv.rv-in{opacity:1;transform:none}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;background:radial-gradient(700px 300px at 50% 120%,rgba(105,170,193,.22),transparent 70%),radial-gradient(500px 260px at 90% -20%,rgba(57,214,163,.14),transparent 70%),var(--bg2);padding:38px 40px;min-height:320px;display:flex;align-items:center;gap:24px}
+#hf{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero .vx{position:absolute;pointer-events:none;will-change:transform}
+.f1{animation:fl1 9s ease-in-out infinite}.f2{animation:fl2 11s ease-in-out infinite}.f3{animation:fl3 8s ease-in-out infinite}
+@keyframes fl1{50%{transform:translate(10px,-14px) rotate(8deg)}}
+@keyframes fl2{50%{transform:translate(-12px,10px) rotate(-10deg)}}
+@keyframes fl3{50%{transform:translate(6px,12px) rotate(14deg)}}
+.hx{position:relative;z-index:2;max-width:640px}
+.kick{display:inline-flex;align-items:center;gap:8px;font:700 11px Pix;letter-spacing:.08em;text-transform:uppercase;color:var(--a2);background:rgba(57,214,163,.08);border:1px solid rgba(57,214,163,.25);border-radius:999px;padding:5px 12px 5px 10px}
+.hx h1{margin:0;font:700 clamp(38px,4.8vw,64px)/1.02 Pix;letter-spacing:.005em;color:var(--tx)}
+.hx h1 em{font-style:normal;color:var(--a);text-shadow:0 0 30px rgba(57,214,163,.5);display:inline-block;animation:emg 3s ease-in-out infinite}
+@keyframes emg{50%{text-shadow:0 0 46px rgba(57,214,163,.85)}}
+.hx p{color:#c3d6db;font-size:16px;margin:14px 0 22px;max-width:540px}
+.hx .row{display:flex;gap:10px;flex-wrap:wrap}
+.hnums{display:flex;gap:26px;margin-top:24px;flex-wrap:wrap}
+.hnums div{display:flex;flex-direction:column}
+.hnums b{font:800 24px Inter;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.hnums span{font-size:11.5px;color:var(--dim)}
+.meter{position:relative;z-index:2;margin-left:auto;width:350px;flex:none;border:1px solid var(--line2);border-radius:16px;background:rgba(10,22,26,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:18px}
+.meter .k{font:700 11px Pix;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:7px}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px}
+.mrow span{color:var(--mut);font-size:12.5px}
+.mrow b{font:800 26px Inter,system-ui,sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.mrow.p b{color:var(--dn)}.mrow.a b{color:var(--a)}
+.mbar{height:8px;border-radius:8px;background:var(--card2);overflow:hidden;margin-top:6px}
+.mbar i{display:block;height:100%;border-radius:8px;transition:width 1.2s cubic-bezier(.2,.7,.2,1);position:relative;overflow:hidden}
+.mbar i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:flow 2s linear infinite}
+@keyframes flow{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.mtick{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.mtick span{font-size:11.5px;color:var(--mut);line-height:1.35}
+.mtick b{font:800 18px Inter;color:var(--dn);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mnote{font-size:11px;color:var(--dim);margin-top:10px;line-height:1.45}
+
+/* ---------- section heads ---------- */
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 0 14px;flex-wrap:wrap}
+.sec-h h2{margin:0;font:700 22px Pix;letter-spacing:.01em;display:flex;align-items:center;gap:10px}
+.sec-h small{color:var(--dim);font-size:12px}
+
+/* ---------- king ---------- */
+.kings{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+.king{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;border-radius:18px;padding:18px;background:radial-gradient(400px 200px at 0% 50%,rgba(57,214,163,.14),transparent 70%),var(--card);cursor:pointer;transition:transform .25s;position:relative;isolation:isolate;min-width:0}
+.king::before{content:'';position:absolute;inset:0;border-radius:18px;padding:1.5px;background:conic-gradient(from var(--ang),rgba(57,214,163,.12),var(--a),rgba(57,214,163,.12) 30%,rgba(57,214,163,.12) 60%,var(--a3),rgba(57,214,163,.12));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 5s linear infinite;z-index:-1;pointer-events:none}
+.king.k2::before{background:conic-gradient(from var(--ang),rgba(94,233,181,.1),var(--sf),rgba(94,233,181,.1) 35%,rgba(94,233,181,.1))}
+@keyframes spin{to{--ang:360deg}}
+.king:hover{transform:translateY(-3px)}
+.king .shn{position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none}
+.king .shn::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.07) 45%,transparent 60%);transform:translateX(-100%);animation:sheen 4.5s infinite}
+@keyframes sheen{60%,100%{transform:translateX(100%)}}
+.king img{width:104px;height:104px;border-radius:14px;object-fit:cover;background:var(--card2);box-shadow:0 0 30px rgba(57,214,163,.25)}
+.king .crown{font:700 11.5px Pix;color:var(--a);letter-spacing:.06em;text-transform:uppercase}
+.king h3{margin:4px 0 2px;font:800 28px Inter,system-ui,sans-serif;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.king .meta{color:var(--mut);font-size:13px}
+.king .big{text-align:right}
+.king .big b{display:block;font:800 32px Inter,system-ui,sans-serif;letter-spacing:-.03em;color:var(--a)}
+.king .big span{color:var(--mut);font-size:12px}
+.king.k2{grid-template-columns:auto 1fr}
+.king.k2 .big{grid-column:1/-1;text-align:left;display:flex;gap:10px;align-items:baseline}
+.king.k2 .big b{color:var(--sf);font-size:24px}
+.king.k2 .crown{color:var(--sf)}
+.king.k2 img{width:80px;height:80px}
+
+/* ---------- trending marquee ---------- */
+.mq{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.mq-in{display:flex;gap:12px;width:max-content;animation:mq var(--dur,60s) linear infinite;padding:4px 0}
+.mq:hover .mq-in{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(calc(-50% - 6px))}}
+.tc{flex:none;width:240px;border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s}
+.tc:hover{transform:translateY(-4px);border-color:var(--a);box-shadow:0 12px 30px rgba(105,170,193,.18)}
+.tc .im{position:relative;height:120px;background:var(--card2);overflow:hidden}
+.tc .im img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.tc:hover .im img{transform:scale(1.08)}
+.tc .im .chg{position:absolute;right:8px;top:8px;font:800 12px Inter,system-ui,sans-serif;padding:3px 8px;border-radius:7px;background:rgba(7,16,19,.82)}
+.tc .im .pp{position:absolute;left:8px;top:8px}
+.tc .bd{padding:10px 12px}
+.tc .bd b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc .bd span{color:var(--mut);font-size:12px}
+
+/* ---------- board ---------- */
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;background:none;color:var(--mut);font:700 13px Inter;padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tabs button.on{background:var(--card2);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line2)}
+.tabs button:hover{color:var(--tx)}
+.bar2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sel{height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:600 13px Inter;padding:0 10px;outline:none;cursor:pointer}
+.sel:focus{border-color:var(--a)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.cc{--rx:0deg;--ry:0deg;display:grid;grid-template-columns:104px 1fr;gap:14px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card);cursor:pointer;transition:transform .25s,border-color .2s,background .2s,box-shadow .25s;position:relative;overflow:hidden;transform:perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));min-width:0}
+.cc::before{content:'';position:absolute;inset:0;background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(57,214,163,.12),transparent 45%);opacity:0;transition:opacity .3s;pointer-events:none}
+.cc:hover{border-color:var(--line2);background:var(--card2);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.cc:hover::before{opacity:1}
+.cc.fresh{animation:pop .7s cubic-bezier(.2,1.4,.4,1),flashA 1.6s}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+.cc .im{width:104px;height:104px;border-radius:10px;overflow:hidden;background:var(--card2);position:relative}
+.cc .im img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.cc:hover .im img{transform:scale(1.07)}
+.cc .im .pp{position:absolute;left:5px;bottom:5px}
+.cc .nm{display:flex;align-items:baseline;gap:6px;min-width:0;padding-right:30px}
+.cc .nm b{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
+.cc .nm span{color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc .sub{color:var(--dim);font-size:11.5px;margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cc .mc{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:12.5px}
+.cc .mc b{color:var(--a2);font-weight:700;border-radius:4px;padding:0 2px}
+.cc .mc b.fu{animation:fu 1.4s}.cc .mc b.fd{animation:fd 1.4s}
+@keyframes fu{0%{background:rgba(94,232,168,.5);color:#fff}}
+@keyframes fd{0%{background:rgba(255,107,138,.5);color:#fff}}
+.cc .bar{height:5px;border-radius:5px;background:var(--card2);overflow:hidden;margin-top:6px}
+.cc .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--a3),var(--a));border-radius:5px;transform-origin:left;animation:grow 1s cubic-bezier(.2,.7,.2,1)}
+.cc .bar.sfb i{background:linear-gradient(90deg,#c9932d,var(--sf))}
+@keyframes grow{from{transform:scaleX(0)}}
+.cc .ft{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--mut);gap:6px}
+.cc .bs{display:flex;height:3px;border-radius:3px;overflow:hidden;margin-top:6px;background:var(--card2)}
+.cc .bs i{display:block;height:100%}
+.star{position:absolute;right:10px;top:10px;width:26px;height:26px;border-radius:7px;border:1px solid var(--line2);background:var(--bg2);color:var(--dim);display:grid;place-items:center;cursor:pointer;font-size:13px;z-index:2;transition:.2s;line-height:1}
+.star:hover{color:var(--a);border-color:var(--a);transform:scale(1.1)}
+.star.on{color:#03140e;background:var(--a);border-color:var(--a);animation:starp .4s}
+@keyframes starp{50%{transform:scale(1.35) rotate(15deg)}}
+.badge{display:inline-flex;align-items:center;gap:4px;font:700 11px Inter,system-ui,sans-serif;padding:3px 7px;border-radius:6px;background:rgba(57,214,163,.12);color:var(--a2);border:1px solid rgba(57,214,163,.28);white-space:nowrap}
+.pp{display:inline-flex;align-items:center;gap:5px;font:700 10.5px Inter;padding:2px 7px;border-radius:6px;background:rgba(6,14,17,.85);border:1px solid var(--line2);white-space:nowrap}
+.pp i{width:6px;height:6px;border-radius:50%}
+.pp.pf{color:var(--pf)}.pp.pf i{background:var(--pf)}
+.pp.sf{color:var(--sf)}.pp.sf i{background:var(--sf)}
+.qt{display:inline-flex;align-items:center;gap:4px;font:700 10.5px Inter;color:var(--sf);background:rgba(94,233,181,.08);border:1px solid rgba(94,233,181,.25);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.qt img{width:12px;height:12px;border-radius:50%}
+.gd{font:700 10.5px Inter;color:var(--up);background:rgba(94,232,168,.08);border:1px solid rgba(94,232,168,.25);border-radius:6px;padding:1px 6px}
+.soc{display:inline-flex;gap:4px}
+.soc span{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;background:var(--bg2);border:1px solid var(--line);color:var(--mut);font-size:10px;font-weight:800;cursor:pointer;transition:.2s}
+.soc span:hover{color:var(--a);border-color:var(--a)}
+.up{color:var(--up)}.dn{color:var(--dn)}
+.skel{height:130px;border-radius:14px;background:linear-gradient(90deg,var(--card) 0%,var(--card2) 50%,var(--card) 100%);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.empty{padding:40px;text-align:center;color:var(--mut);border:1px dashed var(--line2);border-radius:14px;grid-column:1/-1}
+.src{font-size:11.5px;color:var(--dim);margin-top:12px}
+
+/* ---------- maxx levels ---------- */
+.lv{display:inline-flex;align-items:center;gap:5px;font:700 10.5px Pix;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:6px;white-space:nowrap;border:1px solid}
+.lv i{width:6px;height:6px;border-radius:2px}
+.lv.l0{color:#8aa3ad;border-color:#21414d;background:rgba(138,163,173,.06)}.lv.l0 i{background:#8aa3ad}
+.lv.l1{color:#5ee9b5;border-color:rgba(94,233,181,.35);background:rgba(94,233,181,.08)}.lv.l1 i{background:#5ee9b5}
+.lv.l2{color:#9fd6ea;border-color:rgba(105,170,193,.5);background:rgba(105,170,193,.12)}.lv.l2 i{background:#69aac1}
+.lv.l3{color:#03140e;border-color:#9ff3d6;background:linear-gradient(90deg,#39d6a3,#9ff3d6,#69aac1);background-size:200% 100%;animation:shim 3s linear infinite;box-shadow:0 0 14px rgba(57,214,163,.45)}.lv.l3 i{background:#03140e}
+.lv.lu{color:#5d7781;border-color:#17303a}.lv.lu i{background:#5d7781}
+@keyframes shim{to{background-position:-200% 0}}
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative}
+.rung{position:relative;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:16px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s;overflow:hidden;min-width:0}
+.rung:hover{transform:translateY(-4px);border-color:var(--a);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.rung .step{font:700 11px Pix;letter-spacing:.1em;color:var(--dim)}
+.rung h3{margin:6px 0 2px;font:700 26px Pix;letter-spacing:.01em}
+.rung .rule{font-size:12px;color:var(--mut)}
+.rung .cnt2{font:800 30px Inter;letter-spacing:-.03em;margin-top:10px;font-variant-numeric:tabular-nums}
+.rung .cnt2 small{font:600 12px Inter;color:var(--mut);letter-spacing:0;margin-left:4px}
+.rung .stack{display:flex;margin-top:10px;height:30px}
+.rung .stack img{width:30px;height:30px;border-radius:8px;border:2px solid var(--card);margin-left:-8px;object-fit:cover;background:var(--card2)}
+.rung .stack img:first-child{margin-left:0}
+.rung .meter2{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line)}
+.rung .meter2 i{display:block;height:100%;background:linear-gradient(90deg,var(--a3),var(--a));transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+.rung.r3{background:radial-gradient(300px 140px at 100% 0%,rgba(57,214,163,.16),transparent 70%),var(--card);border-color:rgba(57,214,163,.4)}
+.rung.r3 h3{color:var(--a2);text-shadow:0 0 22px rgba(57,214,163,.5)}
+.rung.r2 h3{color:#9fd6ea}.rung.r1 h3{color:var(--sf)}.rung.r0 h3{color:var(--mut)}
+.rung .arrow{position:absolute;right:14px;top:14px;color:var(--dim);font:700 16px Pix}
+.pairs{display:flex;gap:10px;flex-wrap:wrap}
+.pair{display:flex;align-items:center;gap:10px;padding:9px 14px 9px 9px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;transition:border-color .2s,transform .2s,background .2s}
+.pair:hover{border-color:var(--a);transform:translateY(-2px)}
+.pair.on{border-color:var(--a);background:rgba(57,214,163,.08)}
+.pair img{width:28px;height:28px;border-radius:50%;background:var(--card2);object-fit:cover}
+.pair b{font-weight:800}.pair span{color:var(--mut);font-size:12px}
+.pairnote{font-size:11.5px;color:var(--dim);margin-top:8px}
+.lvbox .lvbar{height:10px;border-radius:6px;background:var(--card2);overflow:hidden;margin:10px 0 6px}
+.lvbox .lvbar i{display:block;height:100%;background:linear-gradient(90deg,var(--a3),var(--a));transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+.lvsteps{display:flex;justify-content:space-between;font:700 10px Pix;letter-spacing:.06em;color:var(--dim);text-transform:uppercase}
+.lvsteps .on{color:var(--a2)}
+@media (max-width:1180px){.ladder{grid-template-columns:1fr 1fr}}
+
+/* ---------- coin page ---------- */
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-weight:600;margin-bottom:14px;cursor:pointer}
+.back:hover{color:var(--tx)}
+.cp{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}
+.chd{display:flex;gap:16px;align-items:center;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:16px;flex-wrap:wrap}
+.chd img{width:76px;height:76px;border-radius:14px;object-fit:cover;background:var(--card2);box-shadow:0 0 30px rgba(57,214,163,.2)}
+.chd h2{margin:0;font:800 26px Inter,system-ui,sans-serif;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chd .mint{display:inline-flex;gap:6px;align-items:center;color:var(--mut);font-size:12px;cursor:pointer;margin-top:4px}
+.chd .mint:hover{color:var(--a2)}
+.cact{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center}
+.links{display:flex;gap:6px;flex-wrap:wrap}
+.chart{margin-top:12px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#061013;height:520px;position:relative}
+.chart iframe{width:100%;height:100%;border:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.st{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px;transition:border-color .2s,transform .2s;min-width:0}
+.st:hover{border-color:var(--line2);transform:translateY(-2px)}
+.st span{display:block;color:var(--dim);font-size:11.5px}
+.st b{font:800 18px Inter,system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.press{margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px}
+.press:empty{display:none}
+.press .hd{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.press .tr{display:flex;height:10px;border-radius:6px;overflow:hidden;margin-top:8px;background:var(--card2)}
+.press .tr i{display:block;height:100%;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:16px}
+.box:empty{display:none}
+.box h4{margin:0 0 10px;font:700 15px Pix;letter-spacing:.02em;color:var(--a2)}
+#jup{min-height:560px;border-radius:12px;overflow:hidden}
+.save{border:1px solid rgba(57,214,163,.45);background:radial-gradient(300px 120px at 100% 0%,rgba(57,214,163,.16),transparent 70%),var(--card)}
+.save .big{font:800 32px Inter,system-ui,sans-serif;letter-spacing:-.03em;color:var(--a)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv:last-child{border:0}
+.kv span{color:var(--mut)}
+.kv b{text-align:right}
+
+/* ---------- launch ---------- */
+.lp{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px}
+.form{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:22px}
+.f{margin-bottom:16px}
+.f label:not(.drop){display:block;font:700 12px Pix;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:7px}
+.in{width:100%;height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);color:var(--tx);padding:0 14px;font:500 14px Inter;outline:none;transition:border-color .2s,box-shadow .2s}
+textarea.in{height:96px;padding:12px 14px;resize:vertical}
+.in:focus{border-color:var(--a);box-shadow:0 0 0 4px rgba(57,214,163,.14)}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.drop{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;height:150px;border:1.5px dashed var(--line2);border-radius:12px;background:var(--bg2);color:var(--mut);cursor:pointer;transition:border-color .2s,background .2s;overflow:hidden}
+.drop:hover{border-color:var(--a);background:rgba(57,214,163,.05)}
+.drop img{width:100%;height:100%;object-fit:cover}
+.tkc{font-size:12.5px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--mut)}
+.tkc:empty{display:none}
+.tkc b{color:var(--tx)}
+.rules{border:1px solid rgba(57,214,163,.35);border-radius:14px;padding:14px;background:rgba(57,214,163,.05);margin-bottom:16px}
+.rules h5{margin:0 0 8px;font:700 13px Pix;color:var(--a2);letter-spacing:.04em}
+.curve{width:100%;height:120px;margin-top:10px;display:block}
+.prev{position:sticky;top:76px;display:flex;flex-direction:column;gap:12px}
+.note{font-size:12px;color:var(--dim)}
+
+/* ---------- check ---------- */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.range{width:100%;accent-color:var(--a)}
+.out{font:800 48px Inter,system-ui,sans-serif;letter-spacing:-.04em;color:var(--a)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.vs .box b{font:800 26px Inter,system-ui,sans-serif;letter-spacing:-.03em;display:block}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+
+/* ---------- faq ---------- */
+.fqhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:4px 0 16px}
+.fqt{margin:0;font:700 34px Pix;letter-spacing:.01em}
+.fqs{margin:4px 0 0;color:var(--mut)}
+.fqtools{display:flex;gap:8px;align-items:center;flex:1;justify-content:flex-end;min-width:260px}
+.fqsearch{max-width:340px}
+.fqsearch input{padding-right:14px}
+.fqcats{margin-bottom:18px;width:max-content}
+.fqg{margin-bottom:22px;animation:vin .35s ease}
+.fqg h3{margin:0 0 4px;font:700 13px Pix;letter-spacing:.1em;text-transform:uppercase;color:var(--a)}
+.faq details{border:1px solid var(--line);border-radius:14px;background:var(--card);margin-top:8px;transition:border-color .25s,background .25s}
+.faq details:hover{border-color:var(--line2)}
+.faq details[open]{border-color:rgba(57,214,163,.4);background:linear-gradient(160deg,rgba(57,214,163,.06),transparent 60%),var(--card)}
+.faq summary{list-style:none;cursor:pointer;padding:16px 18px;font-weight:700;font-size:15px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.faq summary::after{content:'+';flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--a);background:rgba(57,214,163,.1);font:700 18px Pix;transition:transform .3s}
+.faq .fa{padding:0 18px 16px;animation:fa .35s ease}
+@keyframes fa{from{opacity:0;transform:translateY(-6px)}}
+.faq .fa p{margin:0;color:#b5cbd2;line-height:1.65}
+.faq mark{background:rgba(57,214,163,.3);color:var(--tx);border-radius:3px;padding:0 2px}
+.fqcmp{display:grid;margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.fqcmp>div{display:grid;grid-template-columns:1.3fr 1fr 1fr;border-top:1px solid var(--line)}
+.fqcmp>div.h{order:-1;border:0;background:var(--bg2)}
+.fqcmp>div.h b{font:700 11px Pix;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.fqcmp span,.fqcmp b{padding:10px 12px;font-size:13px}
+.fqcmp span{color:var(--mut)}
+.fqcmp b.ac{color:var(--a2);background:rgba(57,214,163,.06)}
+.faq summary::-webkit-details-marker{display:none}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:90;background:var(--a);color:#03140e;font-weight:700;padding:11px 16px;border-radius:10px;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.mob{display:none}
+.tlogo{display:none;align-items:center;gap:8px;font:700 22px Pix;color:var(--a2)}
+.tlogo img{width:26px;height:26px;object-fit:contain}
+
+@media (max-width:1180px){.cp,.lp{grid-template-columns:minmax(0,1fr)}.prev{position:static}.meter{display:none}.stats{grid-template-columns:repeat(2,1fr)}.kings{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}aside{display:none}
+  .mob{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(7,16,19,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+  .mob a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--mut);font-weight:600}
+  .mob a.on{color:var(--a)}
+  .mob svg{width:20px;height:20px}
+  .top{padding:10px 14px}.top .hideS{display:none}
+  .page{padding:14px 14px 100px}
+  .hero{padding:28px 20px;min-height:260px}
+  .hnums{gap:18px}.hnums b{font-size:20px}
+  .king{grid-template-columns:auto minmax(0,1fr)}.king .big{grid-column:1/-1;text-align:left;display:flex;gap:10px;align-items:baseline}
+  .king img{width:76px;height:76px}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .calc,.vs,.two,.three{grid-template-columns:1fr}
+  .chart{height:420px}
+  .tlogo{display:flex!important}
+  .hero .mh{display:none}
+  .hero .mo{width:130px!important;right:-34px!important;bottom:-44px!important;opacity:.45}
+  .cact{margin-left:0}
+  .fqtools{min-width:0;width:100%}.fqsearch{max-width:none}.fqcats{width:auto}.fqt{font-size:28px}
+  .bar2 .tools{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body class="locked">
+<!-- INTRO -->
+<div id="intro">
+  <canvas id="ic"></canvas>
+  <div class="iwrap">
+    <div id="ia"></div>
+  </div>
+  <div class="ibar"><i id="ildB"></i></div>
+  <button class="iskip" id="iskip">skip</button>
+</div>
+
+<div class="app">
+  <aside>
+    <a class="logo" href="#/"><img src="assets/img/bull.png" alt=""><b>maxxing</b></a>
+    <nav class="nav" id="nav">
+      <a href="#/" data-r="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+      <a href="#/board" data-r="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Board<span class="cnt" id="nAll">0</span></a>
+      <a href="#/trending" data-r="trending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Trending</a>
+      <a href="#/ladder" data-r="ladder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3v18M17 3v18M7 7h10M7 12h10M7 17h10"/></svg>The ladder</a>
+      <a href="#/watch" data-r="watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Watchlist<span class="cnt" id="nWatch">0</span></a>
+      <a href="#/launch" data-r="launch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Launch a coin</a>
+      <a href="#/check" data-r="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1 3 2.3c0 3-6 1.7-6 4.7 0 1.4 1.3 2.5 3 2.5s3-1.1 3-2.5"/></svg>Maxx check</a>
+      <a href="#/faq" data-r="faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>FAQ</a>
+    </nav>
+    <div class="slab">Platforms</div>
+    <button class="sbtn" data-plat="stonkfun"><span class="pdot sf"></span>StonkFun live<span class="cnt" id="nSf">0</span></button>
+    <button class="sbtn" data-plat="pump.fun"><span class="pdot pf"></span>pump.fun live<span class="cnt" id="nPf">0</span></button>
+    <button class="sbtn" data-plat="maxxing"><span class="pdot au"></span>Maxxing live<span class="cnt" id="nAu">0</span></button>
+    <div class="side-foot">
+      <a class="btn pri" href="#/launch">Launch a coin</a>
+      <button class="btn gh" data-connect="1">Connect wallet</button>
+    </div>
+  </aside>
+  <main>
+    <div class="top">
+      <a class="tlogo" href="#/"><img src="assets/img/bull.png" alt="">maxxing</a>
+      <div class="search hideS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="Search a coin, ticker or address" autocomplete="off"><kbd>/</kbd></div>
+      <span class="sp"></span>
+      <a class="btn pri sm hideS" href="#/launch">Launch a coin</a>
+      <button class="btn gh sm" data-connect="1">Connect wallet</button>
+    </div>
+    <div class="page">
+
+<!-- HOME -->
+<section class="view" id="v-home">
+  <div class="hero">
+    <canvas id="hf"></canvas>
+    <img class="vx f1 mh" src="assets/img/plate1.png" style="right:350px;top:-110px;width:210px;opacity:.8;filter:blur(1.5px)" alt="">
+    <img class="vx f2 mo" src="assets/img/bell1.png" style="right:-30px;bottom:-70px;width:250px;filter:blur(3px)" alt="">
+    <img class="vx f3 mh" src="assets/img/plus1.png" style="right:440px;bottom:-30px;width:96px" alt="">
+    <div class="hx">
+      <h1>Every coin here <em>levels up.</em></h1>
+      <p>pump.fun stopped maxxing. Here fees are minned to 0.5% a trade instead of 1.25%, creators get 0.3% of every trade, snipers in block 0 pay 99%, and every coin climbs from Mid to Ascended.</p>
+      <div class="row"><a class="btn pri" href="#/launch">Launch a coin</a><a class="btn gh" href="#/board">Browse the board</a><a class="btn gh" href="#/ladder">See the ladder</a></div>
+    </div>
+    <div class="meter" id="meter">
+      <div class="k"><i class="dot"></i>Last hour · pump.fun coins below</div>
+      <div class="mrow p"><span>fees at pump.fun's 1.25%</span><b id="mP">—</b></div>
+      <div class="mbar"><i id="mPb" style="width:100%;background:var(--dn)"></i></div>
+      <div class="mrow a"><span>same trades on maxxing at 0.5%</span><b id="mA">—</b></div>
+      <div class="mbar"><i id="mAb" style="width:40%;background:var(--a)"></i></div>
+      <div class="mtick"><span>Paid to pump.fun's curve since you opened this page</span><b id="mT">$0.00</b></div>
+      <div class="mnote" id="mNote">Estimated from each coin's last-hour volume on Jupiter, at the bonding-curve rate.</div>
+    </div>
+  </div>
+
+  <div class="sec-h rv"><h2>Most maxxed right now</h2><small>maxx score = Jupiter organic score</small></div>
+  <div class="kings rv" id="king"><div class="skel" style="height:140px"></div><div class="skel" style="height:140px"></div></div>
+
+  <div id="ladderSec" style="scroll-margin-top:84px"></div>
+  <div class="sec-h rv"><h2>The maxx ladder</h2><small>every live coin, ranked by real buyers · tap a level</small></div>
+  <div class="ladder rv" id="ladder"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+
+  <div class="sec-h rv"><h2>Stonk pairs</h2><small>what StonkFun coins are paired with right now · tap to filter</small></div>
+  <div class="pairs rv" id="pairs"><div class="skel" style="height:48px;width:100%"></div></div>
+  <div class="pairnote rv" id="pairNote"></div>
+
+  <div class="sec-h rv"><h2>Trending</h2><small>StonkFun + pump.fun · last hour · hover to pause</small></div>
+  <div class="mq rv" id="strip"><div class="mq-in"><div class="skel" style="width:240px;height:180px;flex:none"></div><div class="skel" style="width:240px;height:180px;flex:none"></div><div class="skel" style="width:240px;height:180px;flex:none"></div></div></div>
+
+  <div id="market" style="scroll-margin-top:84px"></div>
+  <div class="sec-h"><h2>The board</h2><small id="bCount"></small></div>
+  <div class="bar2">
+    <div class="tabs" id="tabs"><button data-t="new" class="on">New</button><button data-t="trend">Trending</button><button data-t="asc">Ascended</button><button data-t="mog">Mogging</button><button data-t="move">Movers</button><button data-t="top">Top mcap</button><button data-t="watch">★ Watchlist</button></div>
+    <div class="tools">
+      <div class="tabs" id="plat"><button data-p="all" class="on">All</button><button data-p="stonkfun"><span class="pdot sf" style="margin:0"></span>StonkFun</button><button data-p="pump.fun"><span class="pdot pf" style="margin:0"></span>pump.fun</button><button data-p="maxxing"><span class="pdot au" style="margin:0"></span>maxxing</button></div>
+      <select class="sel" id="sort" aria-label="Sort"><option value="def">Sort: default</option><option value="mcap">Market cap</option><option value="v1">Volume 1h</option><option value="holders">Holders</option><option value="aura">Maxx score</option><option value="c1">1h change</option><option value="age">Newest</option></select>
+    </div>
+  </div>
+  <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+</section>
+
+<!-- WATCH -->
+<section class="view" id="v-watch">
+  <div class="sec-h" style="margin-top:4px"><h2>★ Watchlist</h2><small>saved in this browser · refreshed live</small></div>
+  <div class="grid" id="wgrid"></div>
+</section>
+
+<!-- COIN -->
+<section class="view" id="v-coin">
+  <a class="back" href="#/board">← Back to the board</a>
+  <div class="cp">
+    <div style="min-width:0">
+      <div class="chd"><img id="cImg" alt=""><div style="min-width:0"><h2><span id="cName">—</span><span id="cPad"></span><span id="cQuote"></span></h2><div style="color:var(--mut)" id="cSub"></div><div class="mint" id="cMint"></div></div>
+        <div class="cact"><span id="cLv"></span><button class="btn gh xs" id="cStar">☆ Watch</button><button class="btn gh xs" id="cShare">Share on 𝕏</button></div>
+        <div class="links" id="cLinks" style="flex-basis:100%"></div></div>
+      <div class="chart" id="chart"></div>
+      <div class="press" id="cPress"></div>
+      <div class="stats" id="cStats"></div>
+    </div>
+    <div class="side">
+      <div class="box"><h4>Trade</h4><div id="jup"></div><div class="note" id="jupNote" style="margin-top:8px">Swaps run through Jupiter. You sign in your own wallet.</div></div>
+      <div class="box save"><h4>Fees, last hour</h4><div class="big" id="cSave">—</div><div class="note" id="cSaveNote">what this coin's traders would have kept on maxxing</div>
+        <div style="margin-top:10px"><div class="kv"><span>Volume, 1h</span><b id="cVol">—</b></div><div class="kv"><span id="cFpL">At 1.25%</span><b id="cFp" class="dn">—</b></div><div class="kv"><span>At maxxing's 0.5%</span><b id="cFa" style="color:var(--a)">—</b></div></div></div>
+      <div class="box lvbox" id="cLevel"></div>
+      <div class="box" id="cMore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LAUNCH -->
+<section class="view" id="v-launch">
+  <div class="sec-h" style="margin-top:4px"><h2>Launch a coin</h2><small>on maxxing · 0.5% a trade</small></div>
+  <div class="lp">
+    <div class="form">
+      <div class="two"><div class="f"><label>Name</label><input class="in" id="lName" maxlength="32" placeholder="Coin name"></div><div class="f"><label>Ticker</label><input class="in" id="lTk" maxlength="10" placeholder="TICKER" style="text-transform:uppercase"></div></div>
+      <div class="f"><div class="tkc" id="tkCheck"></div></div>
+      <div class="f"><label>Pair with</label><select class="in sel" id="lPair" style="width:100%"><option value="SOL">SOL</option></select><div class="note" style="margin-top:6px">The asset your coin's curve is priced in. StonkFun-style stonk pairs, loaded from what StonkFun coins use today.</div></div>
+      <div class="f"><label>Description</label><textarea class="in" id="lDesc" maxlength="280" placeholder="What's the coin about?"></textarea></div>
+      <div class="f"><label>Image</label><label class="drop" id="lDrop" for="lImg"><span style="font:700 26px Pix;color:var(--a)">+</span><span>Drop an image or click to upload</span></label><input type="file" id="lImg" accept="image/*" hidden></div>
+      <div class="three"><div class="f"><label>X</label><input class="in" id="lX" placeholder="x.com/…"></div><div class="f"><label>Telegram</label><input class="in" id="lTg" placeholder="t.me/…"></div><div class="f"><label>Website</label><input class="in" id="lWeb" placeholder="https://…"></div></div>
+      <div class="rules"><h5>Every maxxing coin launches with</h5>
+        <div class="kv"><span>Trade fee</span><b>0.5%</b></div>
+        <div class="kv"><span>Creator gets</span><b>0.3% of every trade</b></div>
+        <div class="kv"><span>Buys back $MAXXING</span><b>0.2% of every trade</b></div>
+        <div class="kv"><span>Starts at</span><b>Mid, climbs to Ascended</b></div>
+        <div class="kv"><span>Block 0</span><b>99% fee, down to 0.5% in seconds</b></div>
+        <canvas class="curve" id="curve"></canvas>
+        <div class="note">The launch fee: 99% in block 0, falling to 0.5% within seconds. Snipers pay it, everyone after pays 0.5%.</div></div>
+      <button class="btn pri" style="width:100%;height:48px" disabled>Launches open with $MAXXING</button>
+      <div class="note" style="margin-top:10px;text-align:center">The launcher isn't live yet. What you fill in here is exactly what the card will show.</div>
+    </div>
+    <div class="prev">
+      <div class="box"><h4>Your card on the board</h4><div id="lPrev"></div></div>
+      <div class="box"><h4>vs pump.fun</h4><div class="kv"><span>A $1,000 buy on pump.fun</span><b class="dn">$12.50 fee</b></div><div class="kv"><span>The same buy on maxxing</span><b style="color:var(--a)">$5.00 fee</b></div><div class="kv"><span>Creator's cut on pump.fun</span><b>0.30%</b></div><div class="kv"><span>Creator's cut on maxxing</span><b style="color:var(--a)">0.30%</b></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHECK -->
+<section class="view" id="v-check">
+  <div class="sec-h" style="margin-top:4px"><h2>Maxx check</h2><small>how much pump.fun's fee takes from you</small></div>
+  <div class="calc">
+    <div class="box">
+      <div class="presets" id="presets"><button class="btn gh xs" data-s="0.3" data-n="15">Casual</button><button class="btn gh xs" data-s="1" data-n="40">Degen</button><button class="btn gh xs" data-s="5" data-n="80">Whale</button><button class="btn gh xs" data-s="0.5" data-n="200">All day</button></div>
+      <div class="f"><label>Average trade (SOL)</label><input class="range" type="range" id="kSize" min="0.1" max="20" step="0.1" value="1"><div class="num" style="font-size:22px" id="kSizeV">1.0 SOL</div></div>
+      <div class="f"><label>Trades a day</label><input class="range" type="range" id="kN" min="1" max="200" step="1" value="30"><div class="num" style="font-size:22px" id="kNV">30</div></div>
+      <div class="f" style="margin:0"><label>SOL price</label><div class="num" style="font-size:22px" id="kSol">reading…</div></div>
+    </div>
+    <div class="box save">
+      <div class="note">A year on maxxing instead of pump.fun's bonding curve keeps</div>
+      <div class="out" id="kOut">—</div>
+      <div class="note" id="kOutSol"></div>
+      <div class="vs"><div class="box"><span class="note">pump.fun, a year</span><b class="dn" id="kP">—</b></div><div class="box"><span class="note">maxxing, a year</span><b style="color:var(--a)" id="kA">—</b></div></div>
+      <button class="btn gh" style="width:100%;margin-top:14px" id="kShare">Post my maxx check on 𝕏</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="view" id="v-faq">
+  <div class="fqhead">
+    <div><h2 class="fqt">FAQ</h2><p class="fqs">Everything about maxxing: fees, the ladder, stonk pairs, launching, trading and $MAXXING.</p></div>
+    <div class="fqtools"><div class="search fqsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="fq" placeholder="Search the FAQ" autocomplete="off"></div><button class="btn gh sm" id="fqAll">Expand all</button></div>
+  </div>
+  <div class="tabs fqcats" id="fqCats"><button data-c="all" class="on">All</button><button data-c="basics">Basics</button><button data-c="fees">Fees</button><button data-c="ladder">The ladder</button><button data-c="launch">Launching</button><button data-c="board">The board</button><button data-c="trade">Trading &amp; safety</button><button data-c="token">$MAXXING</button></div>
+  <div class="faq" id="faqList">
+    <div class="fqg" data-c="basics"><h3>Basics</h3>
+      <details open><summary>What is maxxing?</summary><div class="fa"><p>A Solana launchpad that maxxes everything pump.fun stopped maxxing. Fees are minned to 0.5% a trade instead of 1.25%. Creators get 0.3% of every trade. Snipers who buy in block 0 pay 99%. And every coin climbs a ladder from Mid to Ascended, earned by real buyers, not bots.</p></div></details>
+      <details><summary>Is maxxing live? Can I launch a coin today?</summary><div class="fa"><p>The site is live; launching isn't yet. Launches open with $MAXXING. Until then you can browse the live board of StonkFun and pump.fun coins with their maxx levels, see what stonks StonkFun coins are paired with, open any coin's chart and stats, trade through Jupiter in your own wallet, keep a watchlist, run the maxx check and check whether a ticker is taken.</p></div></details>
+      <details><summary>Why "maxxing"?</summary><div class="fa"><p>Everyone on CT is maxxing something. Looksmaxxing, auramaxxing, rizzmaxxing. pump.fun stopped: same 1.25% on every trade, snipers still own block 0, and a coin is either pumping or dead. maxxing is the launchpad that never stops. Your coin isn't mid. It's just early.</p></div></details>
+      <details><summary>Which chain is maxxing on?</summary><div class="fa"><p>Solana.</p></div></details>
+      <details><summary>Is maxxing part of pump.fun, StonkFun or Jupiter?</summary><div class="fa"><p>No. maxxing is independent. The board shows StonkFun and pump.fun coins so you can compare, charts come from DEX Screener, and trades run through Jupiter.</p></div></details>
+    </div>
+    <div class="fqg" data-c="fees"><h3>Fees</h3>
+      <details><summary>How much does a trade cost on maxxing?</summary><div class="fa"><p>0.5% of every trade, buys and sells, after the first block.</p></div></details>
+      <details><summary>How does that compare to pump.fun?</summary><div class="fa"><p>pump.fun charges 1.25% on its bonding curve: 0.95% to the platform and 0.30% to the creator, per BloFin's fee guide from September 2026. A $1,000 buy costs $12.50 in fees on pump.fun and $5.00 on maxxing.</p>
+        <div class="fqcmp"><div><span>Trade fee</span><b class="dn">1.25%</b><b class="ac">0.5%</b></div><div><span>Creator's cut</span><b>0.30%</b><b class="ac">0.30%</b></div><div><span>A $1,000 buy</span><b class="dn">$12.50</b><b class="ac">$5.00</b></div><div><span>Sniper in block 0</span><b>normal fee</b><b class="ac">99%</b></div><div><span>Where the rest goes</span><b>the platform</b><b class="ac">buys back $MAXXING</b></div><div><span>Levels</span><b>none</b><b class="ac">Mid → Ascended</b></div><div class="h"><span></span><b>pump.fun</b><b class="ac">maxxing</b></div></div></div></details>
+      <details><summary>Where does the 0.5% go?</summary><div class="fa"><p>0.3% of every trade goes to the coin's creator. 0.2% buys back $MAXXING.</p></div></details>
+      <details><summary>What is the block 0 fee?</summary><div class="fa"><p>The fee starts at 99% in the first block of a launch and falls to 0.5% within seconds. Snipers and bundles that buy in the launch block pay it. Everyone after them pays 0.5%. You can see the curve on the launch page.</p></div></details>
+      <details><summary>Do creators earn more on maxxing?</summary><div class="fa"><p>The creator's cut matches pump.fun's: 0.30% of every trade. The difference is on the trader's side, who pays 0.5% instead of 1.25%.</p></div></details>
+      <details><summary>What do StonkFun coins charge?</summary><div class="fa"><p>Each StonkFun coin sets its own transfer fee, and its coin page shows it. <span id="sfFeeNote"></span></p></div></details>
+      <details><summary>How are the fee numbers on the site worked out?</summary><div class="fa"><p>Each coin's last-hour volume from Jupiter, multiplied by the fee: 1.25% for pump.fun's bonding curve, the reported transfer fee for StonkFun coins, and 0.5% for maxxing. Graduated coins can pay a different rate, so treat them as estimates.</p></div></details>
+      <details><summary>What is the maxx check?</summary><div class="fa"><p>A calculator for your own trading. Set your average trade size and how many trades you make a day, and it shows what pump.fun's 1.25% costs you in a year against maxxing's 0.5%, at the live SOL price.</p></div></details>
+    </div>
+    <div class="fqg" data-c="ladder"><h3>The ladder</h3>
+      <details><summary>What is the maxx ladder?</summary><div class="fa"><p>Every coin has a level: Mid, Maxxing, Mogging or Ascended. The level comes from the coin's maxx score, which is Jupiter's organic score: how much of its trading looks like real people rather than bots. Real buyers move a coin up. Bots don't.</p></div></details>
+      <details><summary>What are the levels?</summary><div class="fa"><p>Mid is a maxx score under 40. Maxxing is 40 to 69. Mogging is 70 to 89. Ascended is 90 and up. Coins Jupiter hasn't scored yet show as Unrated.</p></div></details>
+      <details><summary>Does the ladder use real data?</summary><div class="fa"><p>Yes. Every level on the board is worked out live from Jupiter's public token data. Nothing is simulated, and the counts on the ladder are the coins on the board right now.</p></div></details>
+      <details><summary>What will levels do for maxxing coins?</summary><div class="fa"><p>On maxxing, a coin's level is its rank on the board: higher levels get the top spots, the glow and the Ascended tab. Levels are earned by real buyers, so nobody can buy their way up with bots.</p></div></details>
+    </div>
+    <div class="fqg" data-c="launch"><h3>Launching</h3>
+      <details><summary>How will launching work?</summary><div class="fa"><p>Name, ticker, image, the asset you pair with, a description and your socials. The coin goes live on a bonding curve with maxxing's fees built in: 99% in block 0, then 0.5% a trade, 0.3% of it to you. It starts at Mid and climbs from there. The launch page already shows exactly how your card will look on the board.</p></div></details>
+      <details><summary>When do launches open?</summary><div class="fa"><p>With $MAXXING. Follow maxxing on 𝕏 for the date.</p></div></details>
+      <details><summary>What does "pair with" mean?</summary><div class="fa"><p>The asset your coin's curve is priced in, the way StonkFun coins pair with tokenized stocks and other assets. The launch page lists what StonkFun coins are paired with today.</p></div></details>
+      <details><summary>What does the ticker check do?</summary><div class="fa"><p>Type a ticker on the launch page and maxxing searches StonkFun and pump.fun (through Jupiter) for coins with that exact ticker, so you know before you launch whether it's taken.</p></div></details>
+    </div>
+    <div class="fqg" data-c="board"><h3>The board</h3>
+      <details><summary>Where do the coins on the board come from?</summary><div class="fa"><p>StonkFun coins come from StonkFun's public API, and pump.fun coins from Jupiter's public token data, with Jupiter adding holders, volume and the maxx score. Charts come from DEX Screener. None of them are maxxing coins.</p></div></details>
+      <details><summary>What are stonk pairs?</summary><div class="fa"><p>StonkFun coins are priced against a quote asset, often a tokenized stock. Stonk pairs counts what the StonkFun coins on the board are paired with right now. Tap one to see only those coins.</p></div></details>
+      <details><summary>How often does it update?</summary><div class="fa"><p>New coins every 8 to 10 seconds, Trending every 30 seconds, maxx scores every 45 seconds, Top market cap every minute. Market caps flash green or red when they change.</p></div></details>
+      <details><summary>What do the tabs mean?</summary><div class="fa"><p>New is the latest launches. Trending is Jupiter's top trending coins over the last hour. Ascended and Mogging show the coins at those levels. Movers is the biggest moves over the last 5 minutes. Top mcap is the largest market caps. Watchlist is the coins you starred.</p></div></details>
+      <details><summary>Why does a coin show letters instead of its logo?</summary><div class="fa"><p>That's rare. maxxing tries pump.fun's image server, the coin's own image, Jupiter and the coin's on-chain metadata, in that order, and tries again 12 seconds later for brand-new coins.</p></div></details>
+    </div>
+    <div class="fqg" data-c="trade"><h3>Trading &amp; safety</h3>
+      <details><summary>How do I trade a coin?</summary><div class="fa"><p>Open any coin and use the trade box. Swaps run through Jupiter and you sign them in your own wallet. maxxing never holds your funds and never sees your keys.</p></div></details>
+      <details><summary>Which wallets work?</summary><div class="fa"><p>Phantom, Solflare and Backpack.</p></div></details>
+      <details><summary>Does maxxing add a fee when I trade board coins?</summary><div class="fa"><p>No. You pay that coin's own platform fee (StonkFun's or pump.fun's) and Solana's network fee. maxxing's 0.5% applies to coins launched on maxxing.</p></div></details>
+      <details><summary>What should I check before I buy?</summary><div class="fa"><p>Every coin page shows its maxx level, whether mint and freeze authority are switched off, what share the top 10 holders own, buys against sells over the last hour, liquidity, holders and the dev wallet. Memecoins are high risk and can go to zero. Nothing on maxxing is financial advice.</p></div></details>
+      <details><summary>Where is my watchlist saved?</summary><div class="fa"><p>Only in your browser. It never leaves your device.</p></div></details>
+    </div>
+    <div class="fqg" data-c="token"><h3>$MAXXING</h3>
+      <details><summary>What is $MAXXING?</summary><div class="fa"><p>maxxing's token. Launches open with it, and 0.2% of every trade on every maxxing coin buys it back.</p></div></details>
+      <details><summary>Where is the contract address?</summary><div class="fa"><p>It isn't out yet. Only trust the address posted on this site and on maxxing's 𝕏. Anything else is a copy.</p></div></details>
+    </div>
+    <div class="empty" id="fqNone" style="display:none">No answer matches that. Try another word.</div>
+  </div>
+</section>
+
+    </div>
+  </main>
+</div>
+<nav class="mob" id="mob">
+  <a href="#/" data-r="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="#/board" data-r="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Board</a>
+  <a href="#/watch" data-r="watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Watch</a>
+  <a href="#/ladder" data-r="ladder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3v18M17 3v18M7 7h10M7 12h10M7 17h10"/></svg>Ladder</a>
+  <a href="#/launch" data-r="launch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Launch</a>
+  <a href="#/check" data-r="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/></svg>Check</a>
+  <a href="#/faq" data-r="faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>FAQ</a>
+</nav>
+<div class="toast" id="toast"></div>
+<script src="assets/app.js"></script>
+</body>
+</html>
