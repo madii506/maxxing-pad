@@ -231,7 +231,7 @@ function sfFeeNote() {
 function drop(c, kind, note) {
   dispatchEvent(new CustomEvent('mx:pulse', { detail: { kind } }));
   const box = $('#drops'); if (!box || VIEW !== 'home' || document.hidden || !INTRO.done) return;
-  const d = document.createElement('div'); d.className = 'drop' + (kind === 'lvl' ? ' lvl' : '');
+  const d = document.createElement('div'); d.className = 'hdrop' + (kind === 'lvl' ? ' lvl' : '');
   d.innerHTML = `${img(c, '', '', 's')}<b>$${esc((c.sym || '').slice(0, 10))}</b>${kind === 'lvl' ? note : `<span>${padName(c.pad)} · just launched</span>`}`;
   box.prepend(d); while (box.children.length > 3) box.lastChild.remove(); setTimeout(() => d.remove(), 5600);
 }

@@ -81,7 +81,7 @@ function stage(canvas, dprMax) {
 }
 // the pose both scenes share, so the intro bull lands exactly where the hero bull lives
 const POSE = { ry: .32, rx: .1 };
-const heroFill = () => innerWidth < 820 ? .74 : .66; // bull height as a share of the stage height
+const heroFill = () => innerWidth < 820 ? .66 : .6; // bull height as a share of the stage height
 let HERO = null;
 
 /* ======================================================================
@@ -264,7 +264,7 @@ function intro() {
 function hero() {
   const cv = $('#hb'); if (!cv) return null;
   let st; try { st = stage(cv, 1.75) } catch (e) { cv.closest('.stage')?.classList.add('nogl'); return null }
-  const { R, S, cam } = st;
+  const { R, S, cam } = st; R.toneMappingExposure = 1.22;
   const B = makeBull(); S.add(B.grp);
   // pedestal: a ring with the four levels orbiting it
   const pedW = new THREE.Group(); pedW.position.y = BULL.minY - 1.6; pedW.rotation.x = .32; S.add(pedW);
