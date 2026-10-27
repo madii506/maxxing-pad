@@ -1,4 +1,4 @@
-// maxxing 3D: the intro (a chart that climbs the ladder, then condenses into the voxel bull)
+// maxxing 3D: the intro (a voxel storm that builds the bull)
 // and the live hero bull that reacts to real launches and level-ups.
 import * as THREE from './three.module.min.js';
 import { RoundedBoxGeometry } from './RoundedBoxGeometry.js';
@@ -85,8 +85,8 @@ const heroFill = () => innerWidth < 820 ? .66 : .6; // bull height as a share of
 let HERO = null;
 
 /* ======================================================================
-   INTRO: a candle chart climbs Mid → Maxxing → Mogging → Ascended,
-   then every candle breaks into voxels that condense into the bull.
+   INTRO: a storm of mint voxels spirals in and builds the steel bull from
+   the ground up, his eyes ignite, a wave runs up him, then he flies into the hero.
    ====================================================================== */
 function intro() {
   const el = $('#intro'), cv = $('#ic3'); if (!el || !cv || REDUCE) return false;
@@ -95,109 +95,54 @@ function intro() {
   const B = makeBull(); S.add(B.grp);
   const FLOOR = BULL.minY - 2.2;
 
-  // ---- candles, sized so their voxels are exactly the bull's voxels ----
-  const prof = [7, 9, -4, 8, 6, -5, 11, 7, -3, 10, 8, -4, 12, 9];
-  const CW = 3, GAP = 2.2, C = prof.length; // 3x3 voxel bodies
-  const wick = (i) => [2, 1]; // wick cells above / below
-  let raw = prof.reduce((a, d) => a + Math.abs(d) * CW * CW, 0) + C * 3;
-  const k = N / raw;
-  const bodies = prof.map(d => Math.max(1, Math.round(Math.abs(d) * k)) * Math.sign(d));
-  const cells = []; let open = 0; const top = [];
-  const x0 = -((C - 1) * (CW + GAP)) / 2;
-  bodies.forEach((b, i) => {
-    const up = b > 0, lo = Math.min(open, open + b), hi = Math.max(open, open + b), cx = x0 + i * (CW + GAP);
-    for (let y = lo; y < hi; y++) for (let a = 0; a < CW; a++) for (let z = 0; z < CW; z++) cells.push({ x: cx + a - 1, y, z: z - 1, i, up, w: 0 });
-    const [wu, wd] = wick(i); for (let j = 0; j < wu; j++) cells.push({ x: cx, y: hi + j, z: 0, i, up, w: 1 }); for (let j = 1; j <= wd; j++) cells.push({ x: cx, y: lo - j, z: 0, i, up, w: 1 });
-    top.push(hi + wu); open += b;
-  });
-  // match the count exactly: trim from the end, or stack extra voxels on the last candle
-  while (cells.length > N) cells.pop();
-  { let y = top[C - 1], cx = x0 + (C - 1) * (CW + GAP); while (cells.length < N) { for (let a = 0; a < CW && cells.length < N; a++) for (let z = 0; z < CW && cells.length < N; z++) cells.push({ x: cx + a - 1, y, z: z - 1, i: C - 1, up: true, w: 0 }); y++; top[C - 1] = y } }
-  const lowY = Math.min(...cells.map(c => c.y)), highY = Math.max(...cells.map(c => c.y));
-  const yOff = FLOOR + 2.5 - lowY; cells.forEach(c => c.y += yOff);
-  const span = highY - lowY, Ylev = [0, .4, .7, .9].map(p => FLOOR + 2.5 + p * span);
-  const cTop = top.map(t => t + yOff);
-  // pair candle voxels with bull voxels left-to-right so the chart condenses in order
-  const ci = cells.map((c, i) => i).sort((a, b) => cells[a].x - cells[b].x || cells[a].y - cells[b].y || cells[a].z - cells[b].z);
-  const bi = BULL.V.map((v, i) => i).sort((a, b) => BULL.V[a][0] - BULL.V[b][0] || BULL.V[a][1] - BULL.V[b][1] || BULL.V[a][2] - BULL.V[b][2]);
-  const P = new Array(N);
-  ci.forEach((c, r) => {
-    const cell = cells[c], v = BULL.V[bi[r]], rnd = Math.random;
-    const A = new THREE.Vector3(cell.x, cell.y, cell.z), Bv = new THREE.Vector3(v[0], v[1], v[2]);
-    const M = A.clone().lerp(Bv, .5).add(new THREE.Vector3((rnd() - .5) * 10, (rnd() - .2) * 10, 10 + rnd() * 16));
-    P[bi[r]] = { A, B: Bv, M, cand: cell.i, w: cell.w, up: cell.up, born: .25 + cell.i * .11, d: r / N * .45 + rnd() * .12, ax: new THREE.Vector3(rnd() - .5, rnd() - .5, rnd() - .5).normalize(), sp: (2 + rnd() * 4) * (rnd() < .5 ? -1 : 1) };
-  });
-  // each voxel of a candle appears bottom-up while the candle "prints"
-  const byC = Array.from({ length: C }, () => []); P.forEach((p, i) => byC[p.cand].push(i));
-  byC.forEach(L => { L.sort((a, b) => P[a].A.y - P[b].A.y); L.forEach((i, r) => P[i].born += r / L.length * .28) });
+  // every voxel starts out in a wide swirl around the bull and flies home, bottom rows first
+  const rnd = Math.random, P = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const v = BULL.V[i], Bv = new THREE.Vector3(v[0], v[1], v[2]);
+    const a = rnd() * Math.PI * 2, r = 40 + rnd() * 70, y = (rnd() - .35) * 80;
+    const A = new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r * .7 - 6);
+    const a2 = a + 1.2 + rnd() * .5, r2 = r * (.32 + rnd() * .12);
+    const M = new THREE.Vector3(Math.cos(a2) * r2, THREE.MathUtils.lerp(y, v[1], .65), Math.sin(a2) * r2 * .7 + 4);
+    const hk = (v[1] - BULL.minY) / BULL.h;
+    P[i] = { A, B: Bv, M, d: .15 + hk * 1.05 + rnd() * .22, ax: new THREE.Vector3(rnd() - .5, rnd() - .5, rnd() - .5).normalize(), sp: (2 + rnd() * 4) * (rnd() < .5 ? -1 : 1) };
+  }
 
-  // ---- floor grid, level lines, landing ring ----
+  // ---- floor grid and landing ring ----
   S.fog = new THREE.Fog(0x050d10, 80, 260);
   const grid = new THREE.GridHelper(320, 128, 0x1f5a4c, 0x12303a); grid.position.y = FLOOR; grid.material.transparent = true; grid.material.opacity = 0; grid.material.depthWrite = false; S.add(grid);
-  const LC = [0x8aa3ad, 0x39d6a3, 0x69aac1, 0xe6fbf4];
-  const lines = Ylev.map((y, l) => { const m = new THREE.Mesh(new THREE.BoxGeometry(900, .14, .14), new THREE.MeshBasicMaterial({ color: LC[l], transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })); m.position.set(0, y, -2.5); S.add(m); return m });
   const ring = new THREE.Mesh(new THREE.RingGeometry(.9, 1, 96), new THREE.MeshBasicMaterial({ color: 0x9ff3d6, transparent: true, opacity: 0, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
   ring.rotation.x = -Math.PI / 2; ring.position.y = FLOOR + .05; S.add(ring);
-  const labels = [...el.querySelectorAll('.ilv span')], lit = [0, 0, 0, 0];
 
   // ---- render loop ----
   let W = 0, H = 0;
   const size = () => { W = innerWidth; H = innerHeight; R.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix() };
   size(); addEventListener('resize', size);
   const t0 = performance.now(); let exitAt = 0, exitDur = 900, gone = false, from = null, to = null, flash = 0, revealed = false;
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), pos = new THREE.Vector3(), tmp = new THREE.Vector3(), col = new THREE.Color();
-  const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
-  const chartW = C * (CW + GAP);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), pos = new THREE.Vector3(), col = new THREE.Color();
   const fit = (h) => h / (2 * TAN); // distance that shows h world units vertically
   const bullD = () => fit(BULL.h / (W > H ? .5 : .4)) * (W / H < .8 ? 1.12 : 1);
-  const MORPH = 2.05, LAND = 3.36;
+  const FLY = .95, LAND = 2.45;
 
   function frame(now) {
     if (gone) return;
     const t = FIX != null && +FIX < 90 ? +FIX : (now - t0) / 1000;
-    // camera: follow the price up the chart, then pull into the bull
-    const chartD = Math.max(fit(span * .6), (chartW * .5) / (TAN * (W / H)));
-    const prog = clamp((t - .25) / (C * .11)), ci = clamp(Math.floor((t - .25) / .11), 0, C - 1);
-    const priceY = cTop[ci], priceX = x0 + ci * (CW + GAP);
-    const followX = priceX * .35, followY = THREE.MathUtils.lerp(Ylev[0] + span * .3, priceY - span * .1, ease3(prog));
-    const mk = easeIO(clamp((t - MORPH + .15) / 1.25));
-    camLook.set(THREE.MathUtils.lerp(followX, 0, mk), THREE.MathUtils.lerp(followY, 0, mk), 0);
-    camPos.set(camLook.x + THREE.MathUtils.lerp(-chartD * .16, 0, mk), camLook.y + THREE.MathUtils.lerp(chartD * .07, 0, mk), THREE.MathUtils.lerp(chartD, bullD(), mk));
-    S.fog.near = camPos.z * 1.05; S.fog.far = camPos.z * 2.3;
-    cam.position.copy(camPos); cam.lookAt(camLook);
-
+    // camera: a slow orbit and dolly in, settling straight on as the bull completes
+    const ck = easeIO(clamp(t / 2.35)), D = bullD() * THREE.MathUtils.lerp(1.45, 1, ck), ang = THREE.MathUtils.lerp(-.55, 0, ck);
+    cam.position.set(Math.sin(ang) * D, D * .12 * (1 - ck), Math.cos(ang) * D); cam.lookAt(0, 0, 0);
+    S.fog.near = D * 1.05; S.fog.far = D * 2.3;
     grid.material.opacity = .55 * clamp(t / .6) * (1 - clamp((t - 2.6) / 1.2) * .55);
-    // level lines light up as the price crosses them
-    const priceNow = prog > 0 ? cTop[ci] : -1e9;
-    lines.forEach((ln, l) => {
-      const crossed = priceNow >= Ylev[l] - .5 || l === 0 && t > .3;
-      if (crossed && !lit[l]) { lit[l] = t; labels[l]?.classList.add('on') }
-      const pulse = lit[l] ? Math.exp(-(t - lit[l]) * 3) : 0;
-      ln.material.opacity = (lit[l] ? .38 + .6 * pulse : .08 * clamp(t / .5)) * (1 - clamp((t - MORPH) / .5));
-      ln.scale.y = 1 + pulse * 3;
-    });
-    // HTML labels pinned to the left end of each line
-    labels.forEach((s, l) => {
-      tmp.set(camLook.x, Ylev[l], -2.5).project(cam);
-      const fade = 1 - clamp((t - MORPH) / .45);
-      s.style.transform = `translate(${W < 600 ? 12 : 26}px,${(-tmp.y * .5 + .5) * H}px) translate(0,-50%)`;
-      s.style.opacity = (lit[l] ? 1 : .35) * fade * clamp(t / .5);
-    });
 
-    // voxels: print the candles, then fly into the bull
+    // voxels: spiral in and lock into place
     const gl = B.glow.array;
     for (let i = 0; i < N; i++) {
-      const p = P[i];
-      const bk = clamp((t - p.born) / .22), mt = clamp((t - MORPH - p.d) / .75), e = easeIO(mt);
-      if (mt <= 0) {
-        pos.copy(p.A); const s = bk <= 0 ? 0.0001 : backOut(bk) * (p.w ? .55 : .94); sc.set(s, s, s); q.identity();
-        col.copy(p.up ? MINT : CORAL); if (p.w) col.multiplyScalar(.75); gl[i] = (p.w ? .25 : .45) + (1 - bk) * .8;
-      } else {
+      const p = P[i], mt = clamp((t - p.d) / FLY), e = easeIO(mt);
+      if (mt <= 0) { pos.copy(p.A); sc.set(.0001, .0001, .0001); q.identity(); col.copy(MINT); gl[i] = 1 }
+      else {
         const u = 1 - e; // quadratic bezier A → M → B
         pos.set(u * u * p.A.x + 2 * u * e * p.M.x + e * e * p.B.x, u * u * p.A.y + 2 * u * e * p.M.y + e * e * p.B.y, u * u * p.A.z + 2 * u * e * p.M.z + e * e * p.B.z);
         q.setFromAxisAngle(p.ax, (1 - ease4(mt)) * p.sp * 3.14);
-        const s = (p.w ? .55 + .45 * e : .94 + .06 * e) * (1 - .35 * Math.sin(Math.PI * e)); sc.set(s, s, s);
-        col.copy(p.up ? MINT : CORAL).lerp(STEEL, ease3(mt)); gl[i] = (1 - ease3(mt)) * .55 + Math.sin(Math.PI * mt) * .5;
+        const s = Math.min(1, mt * 5) * (.7 + .3 * e); sc.set(s, s, s);
+        col.copy(MINT).lerp(STEEL, ease3(clamp((mt - .55) / .45))); gl[i] = (1 - ease3(mt)) * .9 + (mt >= 1 ? 0 : Math.max(0, mt - .85) * 3);
       }
       m4.compose(pos, q, sc); B.M.setMatrixAt(i, m4); B.M.setColorAt(i, col);
     }
@@ -226,7 +171,7 @@ function intro() {
       if (k >= 1) { finish(); return }
     }
     R.render(S, cam);
-    if (!exitAt && (FIX == null || +FIX >= 90) && MX.loaded && ((t > 4.55 && MX.loaded() >= 2) || t > 6.2)) MX.close && MX.close();
+    if (!exitAt && (FIX == null || +FIX >= 90) && MX.loaded && ((t > 3.7 && MX.loaded() >= 2) || t > 5.4)) MX.close && MX.close();
     requestAnimationFrame(frame);
   }
   function finish() {
