@@ -144,7 +144,7 @@ function intro() {
   let W = 0, H = 0;
   const size = () => { W = innerWidth; H = innerHeight; R.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix() };
   size(); addEventListener('resize', size);
-  const t0 = performance.now(); let exitAt = 0, exitDur = 900, gone = false, from = null, to = null, flash = 0;
+  const t0 = performance.now(); let exitAt = 0, exitDur = 900, gone = false, from = null, to = null, flash = 0, revealed = false;
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), pos = new THREE.Vector3(), tmp = new THREE.Vector3(), col = new THREE.Color();
   const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
   const chartW = C * (CW + GAP);
@@ -221,6 +221,7 @@ function intro() {
       const k = clamp((now - exitAt) / exitDur), ek = easeIO(k);
       if (to) { B.grp.position.lerpVectors(from.p, to.p, ek); B.grp.scale.setScalar(THREE.MathUtils.lerp(from.s, to.s, ek)); B.grp.rotation.y = THREE.MathUtils.lerp(from.ry, POSE.ry, ek); B.grp.rotation.x = THREE.MathUtils.lerp(from.rx, POSE.rx, ek) }
       cv.style.opacity = to ? (k < .78 ? 1 : 1 - (k - .78) / .22) : 1 - ek;
+      if (to && k >= .78 && !revealed) { revealed = true; HERO && HERO.reveal() }
       if (!to) B.grp.scale.setScalar(1 + ek * .6);
       if (k >= 1) { finish(); return }
     }
@@ -231,7 +232,7 @@ function intro() {
   function finish() {
     gone = true; removeEventListener('resize', size);
     try { R.dispose(); R.forceContextLoss() } catch (e) { }
-    el.remove(); HERO && HERO.show(true);
+    el.remove(); HERO && HERO.show();
   }
   // called by app.js when the intro closes (auto, click, skip or key)
   window.__mx3dIntro = {
@@ -241,7 +242,7 @@ function intro() {
       const t = (exitAt - t0) / 1000;
       // if skipped before the bull exists, just fade
       const stageEl = $('#hb'), home = MX.isHome ? MX.isHome() : true;
-      if (t < LAND - .1 || !stageEl || !home) { to = null; HERO && HERO.show(false); return }
+      if (t < LAND - .1 || !stageEl || !home) { to = null; HERO && HERO.show(); return }
       for (let i = 0; i < N; i++) { m4.makeTranslation(BULL.V[i][0], BULL.V[i][1], BULL.V[i][2]); B.M.setMatrixAt(i, m4) }
       const r = stageEl.getBoundingClientRect();
       const D = cam.position.z, halfH = D * TAN, halfW = halfH * cam.aspect;
@@ -250,7 +251,7 @@ function intro() {
       const curPx = BULL.h / (2 * halfH) * H, wantPx = r.height * heroFill();
       from = { p: B.grp.position.clone(), s: B.grp.scale.x, ry: B.grp.rotation.y, rx: B.grp.rotation.x };
       to = { p: new THREE.Vector3(tx, ty, 0), s: wantPx / curPx };
-      HERO && HERO.show(false, exitDur * .78);
+      HERO && HERO.start();
     }
   };
   requestAnimationFrame(frame);
@@ -339,7 +340,9 @@ function hero() {
   }
   requestAnimationFrame(frame);
   return {
-    show(on, delay = 0) { if (!shown) { shown = true; tShow = performance.now(); size() } setTimeout(() => { cv.style.opacity = '1'; cv.closest('.stage')?.classList.add('live') }, on ? 0 : delay) },
+    start() { if (!shown) { shown = true; tShow = performance.now(); size() } },
+    reveal() { cv.style.opacity = '1'; cv.closest('.stage')?.classList.add('live') },
+    show() { this.start(); this.reveal() },
     pulse,
   };
 }
@@ -347,5 +350,5 @@ function hero() {
 /* ---------------- boot ---------------- */
 try { HERO = hero() } catch (e) { HERO = null }
 const started = (() => { try { return intro() } catch (e) { console.warn('intro', e); return false } })();
-if (!started) HERO && HERO.show(true);
+if (!started) HERO && HERO.show();
 window.__mx3d = { ok: true, intro: started, hero: !!HERO };
